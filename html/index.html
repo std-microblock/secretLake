@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <title id='set-index-title'>Ganxiaozhe - 个人官网</title>
+  <meta charset="utf-8" />
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no" />
+  <meta name="Keywords" content="Ganxiaozhe,个人官网,个人博客" />
+  <meta name="Description" content="Ganxiaozhe Very [Cute]. 个人官网" />
+  <meta name="author" content="甘小蔗" />
+  <link rel="shortcut icon" type="image/ico" href="/favicon.ico" />
+
+  <link type="text/css" rel="stylesheet" href="/lib/css/gxz-basic.css" />
+  <link type="text/css" rel="stylesheet" href="/lib/css/gazeimg.css" />
+
+  <link href="https://fonts.googleapis.com/css?family=Poppins:800" rel="stylesheet">
+
+  <style type="text/css">
+    .idx-column {
+      width: 100%;
+      height: 100%;
+    }
+
+    .idx-wrapper {
+      position: relative;
+      width: calc(100% - 270px);
+      height: 100%;
+    }
+
+    .idx-nav {
+      height: 100%;
+      width: 270px;
+      box-shadow: 0px 0px 7px 1px rgba(0, 0, 0, 0.1);
+      background-color: rgb(var(--black-15));
+    }
+
+    .idx-nav .nav-logo {
+      height: 90px;
+      align-items: flex-end;
+    }
+
+    .idx-nav .nav-logo img {
+      width: 52px;
+      height: 52px;
+      filter: grayscale(1);
+    }
+
+    .idx-nav .nav-wrapper {
+      height: calc(100% - 90px);
+    }
+
+    .nav-list {
+      font-size: 13px;
+      font-weight: 600;
+      text-align: center;
+    }
+
+    .nav-list li {
+      padding: 6px 0;
+      letter-spacing: .05em;
+      color: rgb(var(--black-1));
+    }
+
+    .nav-list li:hover {
+      color: rgb(var(--black-6));
+    }
+
+    .idx-banner {
+      width: 50%;
+      height: 100%;
+      position: relative;
+      align-items: flex-end;
+      background-color: #000;
+    }
+
+    .idx-banner .cover {
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 100%;
+      width: 100%;
+      overflow: hidden;
+    }
+
+    .idx-banner .cover .bg-img {
+      width: 100%;
+      height: 100%;
+      transition: all 0.5s ease-out;
+      background-image: url(/lib/img/bg/dark-sky.jpeg);
+      background-attachment: unset;
+    }
+
+    .idx-banner:hover .cover .bg-img {
+      transform: scale(1.3);
+    }
+
+    .idx-banner .text {
+      padding: 40px;
+      color: #fff;
+      width: 80%;
+      min-width: 360px;
+      z-index: 1;
+    }
+
+    .idx-banner .text p {
+      font-size: 14px;
+      line-height: 1.75;
+    }
+
+    .idx-banner .text h3 {
+      font-size: 50px;
+      font-weight: 800;
+      font-family: 'Poppins', cursive, sans-serif;
+    }
+
+    .idx-container {
+      width: 50%;
+      height: 100%;
+      padding: 60px 60px 0 60px;
+      grid-gap: 0px 60px;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      overflow-y: auto;
+    }
+
+    .idx-container::-webkit-scrollbar {
+      width: 5px;
+      height: 3px;
+    }
+
+    .idx-container .gbox {
+      padding-bottom: 60px;
+    }
+
+    .idx-container .gbox .cover {
+      overflow: hidden;
+      position: relative;
+    }
+
+    .idx-container .gbox .cover img {
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+      transition: all 0.25s ease;
+    }
+
+    .idx-container .gbox .cover:hover img {
+      transform: scale(1.1);
+      filter: brightness(0.7);
+    }
+
+    .idx-container .gbox .attrs {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      z-index: 1;
+    }
+
+    .idx-container .gbox .attrs .attr {
+      display: inline-block;
+      padding: 5px 12px;
+      border: 1px solid #fff;
+      font-size: 13px;
+      font-weight: 500;
+      color: #fff;
+    }
+
+    .idx-container .gbox .attrs .attr+.attr {
+      margin-left: 12px;
+    }
+
+    .idx-container .gbox .body {
+      margin-top: 0.8rem;
+    }
+
+    .idx-container .gbox .title {
+      font-size: 1.6rem;
+      font-weight: 800;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    .idx-container .gbox p {
+      margin-top: 0.8rem;
+      line-height: 1.3;
+      font-size: 15px;
+      color: rgb(var(--black-4));
+    }
+
+    /* 小屏 */
+    @media screen and (max-width: 960px) {
+      .gl-hide-pe {
+        display: none !important;
+      }
+
+      .idx-column {
+        display: block;
+        padding-top: 70px;
+      }
+
+      .idx-wrapper {
+        display: block;
+        height: auto;
+        width: 100%;
+      }
+
+      .idx-banner {
+        width: 100%;
+        height: calc(100vh - 70px);
+      }
+
+      .idx-container {
+        width: 100%;
+        height: auto;
+        overflow: hidden;
+      }
+
+      .idx-nav {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 70px;
+        width: 100%;
+        z-index: 9;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .idx-nav .nav-logo {
+        height: 100%;
+        align-items: center;
+        padding-left: 20px;
+      }
+
+      .idx-nav .nav-logo img {
+        width: 42px;
+        height: 42px;
+      }
+    }
+
+    .idx-nav .navbtn {
+      display: block;
+      padding: 20px;
+      cursor: pointer;
+    }
+
+    .idx-nav .navbtn:before,
+    .idx-nav .navbtn:after {
+      content: "";
+      display: block;
+      width: 28px;
+      height: 3px;
+      border-radius: 1px;
+      background: rgb(var(--white));
+      transform-origin: 50% 50%;
+      transition: transform 1s cubic-bezier(0.48, 0.43, 0.29, 1.3), background-color 0.3s, height 0.3s
+    }
+
+    .idx-nav .navbtn:after {
+      margin-top: 10px;
+    }
+
+    .idx-nav .navbtn:hover:before,
+    .idx-nav .navbtn:hover:after {}
+
+    #navbtn:checked~.navbtn:before {
+      -webkit-transform: translateY(7px) rotate(-225deg);
+      transform: translateY(7px) rotate(-225deg);
+    }
+
+    #navbtn:checked~.navbtn:after {
+      -webkit-transform: translateY(-7px) rotate(225deg);
+      transform: translateY(-7px) rotate(225deg);
+    }
+  </style>
+
+</head>
+
+<body>
+
+  <div id='uni-overlayTip' class='uni-overlayTip gl-flex center'>
+    <div class='gl-flex btw'>
+      <img class='loader' src='/lib/img/gxzv-icon.png'>
+      <div class='line subTip'></div>
+      <div class='tips subTip'>
+        <h5>页面加载缓慢</h5>
+        <p class='sub mt-2'>请检查网络或尝试刷新重试</p>
+      </div>
+    </div>
+  </div>
+
+  <div class='idx-column gl-flex btw'>
+    <nav class='idx-nav'>
+      <div class='gl-flex center nav-logo'><a href='/'><img src='/lib/img/gxzv-icon.png'></a></div>
+      <div class='gl-flex center nav-wrapper gl-hide-pe'>
+        <ul class='nav-list'>
+          <a href='/'>
+            <li>主页</li>
+          </a>
+          <a href='/'>
+            <li>项目</li>
+          </a>
+          <a href='/'>
+            <li>站点</li>
+          </a>
+          <a href='/'>
+            <li>关于</li>
+          </a>
+        </ul>
+      </div>
+      <input type='checkbox' class='gl-hide' id='navbtn' />
+      <label class='navbtn gl-hide-pc' for='navbtn'></label>
+    </nav>
+    <div class='idx-wrapper gl-flex btw'>
+      <a class='idx-banner gl-flex' href='/about/'>
+        <div class='cover'>
+          <div class='bg-img glbg-img'></div>
+        </div>
+        <div class='text'>
+          <h3>Stories of My Life and Others</h3>
+          <p class='mt-3'>万物皆有裂痕 那是光进来的地方. There is a crack in everything, that's how the light gets in. — Leonard
+            Cohen《Anthem》</p>
+        </div>
+      </a>
+
+      <div class='idx-container gl-grid'>
+        {{{:for article in articles:
+        <div class='gbox'>
+        <div class='cover' onclick='document.location.href="/article/{{{article.alias}}}"' style="cursor: pointer;">
+        <div class='attrs'>
+          {{{:for tag in article.tags:
+              <div class='attr ly-sign'>{{{tag}}}</div>
+        }}}
+      </div>
+      <img src='{{{article.img}}}'>
+    </div>
+
+    <div class='body' onclick='document.location.href="/article/{{{article.alias}}}"' style="cursor: pointer;">
+      <h4 class='title'>{{{article.title}}}</h4>
+      <p>{{{article.subtitle}}}</p>
+    </div>
+  </div>
+  }}}
+  </div> <!-- idx-container -->
+  </div>
+  </div>
+
+
+  <script type="text/javascript" src="/lib/js/gquery.js"></script>
+  <script type="text/javascript" src="/lib/js/gxz-basic.js"></script>
+
+  <script type="text/javascript">
+    let _gt = {
+      titles: ['Approachable', 'Amusing', 'Cute', 'Dangerous', 'Exciting', 'Fatigued', 'Important', 'Meticulously', 'Mysterious', 'Riveting', 'Tasteful']
+    };
+    $(function () {
+      $('#set-index-title').innerText = 'Ganxiaozhe, Very ' + gxz.saying.random(_gt.titles, 'both') + ' - 个人官网';
+
+      gxz.el.show({ el: $('.nav-list li'), wait: 500, delay: 100 });
+      gxz.el.show({ el: $('.idx-banner *'), wait: 400, delay: 200 });
+      gxz.el.show({ el: $('.idx-container .gbox'), wait: 1600, delay: 600, top: '50px' });
+    });
+  </script>
+</body>
+
+</html>

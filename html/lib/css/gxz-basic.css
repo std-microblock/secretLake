@@ -1,0 +1,396 @@
+@charset "UTF-8";
+@import "/lib/css/gxz-layout.css";
+@import "/lib/fonts/gxz/css/fontello.css";
+
+/*
+ * By gxzv.com In MIT
+ * 
+ * CSS 初始化
+ */
+body,body[unitvs-theme='light']{
+	--white: 38,38,38;
+	--black: 250,250,250;
+	--black-1: 12, 13, 14;--black-2: 20, 23, 25;--black-3: 47, 51, 55;
+	--black-4: 60, 65, 70;--black-5: 83, 90, 96;--black-6: 106, 115, 124;
+	--black-7: 132, 141, 149;--black-8: 145, 153, 161;--black-9: 159, 166, 173;
+	--black-10: 187, 192, 196;--black-11: 200, 204, 208;--black-12: 214, 217, 220;
+	--black-13: 228, 230, 232;--black-14: 239, 240, 241;--black-15: 255, 255, 255;
+}
+body[unitvs-theme='dark']{
+	--white: 255,255,255;
+	--black: 38,38,38;
+	--black-1: 250, 250, 250;--black-2: 239, 240, 241;--black-3: 228, 230, 232;
+	--black-4: 214, 217, 220;--black-5: 200, 204, 208;--black-6: 187, 192, 196;
+	--black-7: 159, 166, 173;--black-8: 145, 153, 161;--black-9: 132, 141, 149;
+	--black-10: 106, 115, 124;--black-11: 83, 90, 96;--black-12: 60, 65, 70;
+	--black-13: 47, 51, 55;--black-14: 20, 23, 25;--black-15: 12, 13, 14;
+}
+
+*, *::before, *::after {box-sizing: border-box;}
+html, body {scroll-behavior:smooth;height: 100%;}
+body {background: rgb(var(--black));color: rgb(var(--black-1));}
+body,div,dl,dt,dd,ul,ol,li,h1,h2,h3,h4,h5,h6,pre,code,form,fieldset,legend,input,button,textarea,p,blockquote,th,td {margin:0;padding:0;}
+td,th,caption {font-size:14px;}
+h1, h2, h3, h4, h5, h6 {font-weight:normal; font-size:100%;}
+address, caption, cite, code, dfn, em, strong, th, var {font-style:normal;font-weight:normal;}
+a {color:rgb(30,125,255);text-decoration:none;-webkit-transition: .3s all;transition: .3s all;}
+a, a:hover, a:visited, a:active, a:link {text-decoration: none;-webkit-font-smoothing: antialiased;}
+img {border:none;}
+ol,ul,li {list-style:none;}
+input, textarea, select, button {resize:none;}
+table {border-collapse:collapse;}
+.clearfix:after {content:".";display:block;height:0;clear:both;visibility:hidden;}
+.clearfix {*zoom:1; }
+strong {font-weight: bold;}
+/*
+ * 滚轮样式
+ */
+::-webkit-scrollbar {width: 10px;height: 7px;}
+::-webkit-scrollbar-thumb {
+	background-color: rgba(var(--black-3),0.7);
+	outline-offset: -2px;outline: 0px solid #fff;
+	border: 0px solid #fff;border-radius: 1px;
+}
+::-webkit-scrollbar-thumb:hover {background-color: rgba(var(--black-3),0.7);}
+
+body.nobar {overflow: hidden;height: auto;}
+#all-container {min-height: 100%;}
+.theme-bg {background: rgb(var(--black-15));}
+
+/*
+ * body预加载动画
+ */
+.uni-overlayTip {
+	position: fixed;top:0;left:0;z-index: 1001;
+	width: 100%;height: 100%;background-color: rgb(20,20,20);
+}
+.uni-overlayTip .loader {
+	display:block;width:256px;height:256px;
+	animation: body-preload 2s cubic-bezier(.55,.5,.45,.5) infinite;
+}
+.uni-overlayTip .loader.done {animation: none;}
+.uni-overlayTip .subTip {display: none;color: rgb(250,250,250);}
+.uni-overlayTip .line {
+	height: 256px;width: 2px;margin: 0 50px;
+	background-image: -webkit-linear-gradient(top,rgb(20,20,20),#e2e1e4 50%,rgb(20,20,20));
+	background-image: -o-linear-gradient(top,rgb(20,20,20),#e2e1e4 50%,rgb(20,20,20));
+	background-image: linear-gradient(to top,rgb(20,20,20),#e2e1e4 50%,rgb(20,20,20));
+	background-repeat: no-repeat;
+}
+.uni-overlayTip .tips h5 {font-size: 22px;font-weight: 600;}
+.uni-overlayTip .tips .sub {font-size: 13px;}
+@keyframes body-preload {
+	0% {filter: grayscale(1);transform:rotate(0deg)}
+	50% {filter: grayscale(0.5);transform:rotate(180deg)}
+	100% {filter: grayscale(1);transform:rotate(359deg)}
+}
+@media screen and (max-width: 768px){
+	.uni-overlayTip .loader {width: 220px;height: 220px;}
+	.uni-overlayTip > .gl-flex {display: block;}
+	.uni-overlayTip .line {
+		height: 2px;width: 100%;margin: 30px 0px;
+		background-image: -webkit-linear-gradient(left,rgb(20,20,20),#e2e1e4 50%,rgb(20,20,20));
+		background-image: -o-linear-gradient(left,rgb(20,20,20),#e2e1e4 50%,rgb(20,20,20));
+		background-image: linear-gradient(to right,rgb(20,20,20),#e2e1e4 50%,rgb(20,20,20));
+	}
+	.uni-overlayTip .tips {text-align: center;}
+}
+
+/*
+ * 弹窗UI
+ */
+.ly-block-fixed {
+	display:block;width: 760px;height: 468px;
+	position: fixed;left: 50%;top: 50%;z-index: 2;
+	transform: translateX(-50%) translateY(-50%);
+	box-shadow: 0 16px 20px 2px rgba(0, 0, 0, 0.14), 0 6px 30px 5px rgba(0, 0, 0, 0.12), 0 8px 10px -5px rgba(0, 0, 0, 0.2);
+	border-radius: 5px;background: #fff;
+}
+.ly-block-fixed .btn-close {
+	display:block;position:absolute;top:-8px;right:2px;
+	color: #f1f1f1;font-size: 40px;font-weight: bold;
+	cursor:pointer;
+}
+.ly-block-fixed .block-title {
+	padding:10px 20px;background-color:rgba(208,208,208,0.5);font-size:25px;
+}
+.g-dialog {display:none;z-index: 5;}
+.g-dialog .ly-block-fixed {width:520px;height:auto;color: #555;}
+.g-dialog .ly-head {
+	display: -webkit-box;display: flex;-webkit-box-align: start;align-items: flex-start;
+	-webkit-box-pack: justify;justify-content: space-between;
+	padding: 1.25rem 1.75rem;border-bottom: 1px solid #f1f2f3;
+	border-top-left-radius: 0.3rem;border-top-right-radius: 0.3rem;
+	font-size: 1.23047rem;line-height: 1.9;font-weight: 400;
+}
+.g-dialog .ly-body {
+	position: relative;-webkit-box-flex: 1;flex: 1 1 auto;padding: 1.75rem;
+	max-height: calc(100vh - 160px);overflow-y: auto;
+}
+.g-dialog .ly-footer {
+	display: -webkit-box;display: flex;-webkit-box-align: center;align-items: center;
+	-webkit-box-pack: end;justify-content: flex-end;
+	padding: 1rem 1.75rem;border-top: 1px solid #f1f2f3;
+}
+.g-dialog .ly-footer > :not(:last-child) {margin-right: .25rem;}
+
+/*
+ * 按钮UI
+ */
+.ly-btn {
+	display: inline-block;padding: 0.3rem 1.25rem;-webkit-appearance: none;
+	font-size: 12px;text-align: center;font-weight: 600;line-height: 1.9;
+	letter-spacing: 1.7px;text-transform: unset;white-space: nowrap;
+	border: 1px solid transparent;border-radius: 2px;outline: none;
+	-webkit-transition: 0.15s linear;transition: 0.15s linear;
+	cursor:pointer;
+}
+.ly-btn > .xm-icon {margin-right: .25rem;}
+.btn-gray {color: #757575;background-color: #e9ecf0;border-color: #e9ecf0;}
+.btn-gray:hover {
+	color: #757575;background-color: #dde2e8;border-color: #dde2e8;
+	-webkit-box-shadow: 0 1px 10px rgba(233, 236, 240, 0.4);
+		box-shadow: 0 1px 10px rgba(233, 236, 240, 0.4);
+}
+.btn-aqua {color: #fff;background-color: #50a1ff !important;border-color: #50a1ff;}
+.btn-aqua:hover {
+	color: #fff;background-color: #3c96ff;border-color: #3c96ff;
+	-webkit-box-shadow: 0 1px 10px rgba(80, 161, 255, 0.4);
+		box-shadow: 0 1px 10px rgba(80, 161, 255, 0.4);
+}
+@media screen and (max-width: 768px){
+	.ly-block-fixed {width: 100%;height: 468px;}
+	.g-dialog .ly-block-fixed {width: 100%;height: auto;}
+	.dialog-docs {height: 360px;overflow-y: auto;}
+}
+
+/*
+ * 分页UI
+ */
+.gl-pages .page-item {
+	display: block;padding: 0 8px;border-radius: 2px;
+	font-size: 13px;line-height: 1.8;border: 1px solid rgb(var(--black-11));
+	color: #fff;
+}
+.gl-pages .page-item + .page-item {margin-left: 4px;}
+
+.gl-pages .page-item.clear {border: 1px solid transparent;}
+.gl-pages .page-item.active {
+	background-color: #00B3FF;border: 1px solid transparent;
+}
+
+/*
+ * 页尾UI
+ */
+#navFooter {
+	display: -webkit-flex;display: -ms-flexbox;display: flex;width: 100%;
+	-webkit-flex-direction: column;-ms-flex-direction: column;flex-direction: column;
+	padding: 20px 0;background-color: rgb(var(--black-15));
+	box-shadow: 5px 1px 8px rgba(var(--black-1),0.15);
+}
+#navFooter .footerNav {
+	width: 100%;max-width: 1360px;margin: 0 auto;font-size: 11px;color: rgb(var(--black-5));
+	padding-top: 30px;
+}
+#navFooter .footerNav a {color:inherit;cursor:pointer;}
+#navFooter .footerNav a:hover {color:rgb(var(--black-1));}
+.footerNav .footer-banner {
+	padding:20px;margin:0 20px;border-top: solid 1px #333;border-bottom: solid 1px #333;
+	text-align: center;
+}
+.footerNav .footer-banner .item {display: inline-flex;align-items: center;white-space: nowrap;}
+.footerNav .footer-banner .item + .item {margin-left:1.3rem;}
+.footerNav .footer-banner .item .icon {
+	display: block;width: 24px;height: 24px;
+	font-size: 20px;line-height: 24px;margin-right: 5px;
+}
+.footerNav .footer-banner .item .text {line-height: 27px;}
+.footerNav .footer-state {padding: 20px;}
+.footerNav .footer-state .gxz-info {padding: 5px 20px 0 0;line-height: 1;: visible;}
+.footerNav .footer-state .disclaimers {padding: 5px 0;font-size: 11px;}
+.footerNav .footer-state .disclaimers .listMap {display: inline-block;margin-left: 4px;}
+/* 移动端 */
+@media screen and (max-width: 768px){
+	.footerNav .footer-state .disclaimers {width: 100%;}
+	.footerNav .footer-state .disclaimers .listMap {display: block;margin-left: 0;margin-top:5px;}
+}
+
+/*
+ * 导航UI [部分]
+ */
+#navput {position: relative;width: 100%;height: 50px;}
+.nav_mText {
+	display: block;background-color: rgb(var(--black-15));
+	box-shadow: 0 1px 4px rgba(12,13,14,0.15);
+}
+.nav_content {
+	position: fixed;z-index:9;top: 0;right: 0;
+	display:block;margin:0 auto;background-color: rgb(var(--black-15));
+	-webkit-transition: left,right 0.5s ease-out;transition: left,right 0.5s ease-out;font-weight: 300;
+	box-shadow: 0 1px 4px rgba(12,13,14,0.15);
+}
+#nav-user {
+	display: flex;align-items: center;justify-content: center;
+	height: 50px;line-height: 50px;min-width: 120px;
+	padding:0 15px;float: right;color: rgb(var(--black-6));font-size:15px;
+}
+#nav-user a {color: rgb(var(--white));}
+
+/* PC */
+@media screen and (min-width: 769px){
+	body, button, input, select, textarea {
+		font: 17px/1.2 "\5FAE\8F6F\96C5\9ED1", "Microsoft Yahei","Hiragino Sans GB", cursive, arial, "\5B8B\4F53";
+		-webkit-font-smoothing: antialiased;margin: 0px;
+	}
+	#all-container {padding-bottom: 227px;}
+	#navFooter {margin-top: -227px;}
+
+	.nav_mText {height: 50px;}
+	.nav_mText * {display: none;}
+	.nav_cb {display:none;}
+	.nav_flex {display:none;}
+	.wrap-btn {display:none;}
+
+	.nav_content {width:100%;height:50px;min-width:770px;}
+	.nav_content .nav_logo {
+		display:inline-block;width:62px;line-height:50px;
+		padding: 0 15px;float: left;
+	}
+	.nav_content .nav_logo img {width:32px;height:32px;margin-right:6px;vertical-align:middle;}
+
+	.nav_list {display:inline-block;float:right;margin:0;padding:0;}
+	.nav_list li {display:inline-block;margin:0;padding:0;vertical-align: top;}
+	.nav_list li .nav_a {
+		display: inline-block;outline: none;line-height:50px;padding:0 15px;
+		text-shadow: 0 0 1px rgba(255,255,255,0.1);color:rgb(var(--white));
+		letter-spacing: 1px;font-weight: 200;font-size:16px;
+		-webkit-transition: all 0.3s;transition: all 0.3s;
+		text-decoration: none;text-align:center;
+	}
+	.nav_list li .nav_a:hover {background:rgba(var(--white),0.2);box-shadow: inset 0 -1px rgba(0,0,0,0.1);}
+}
+ 
+
+/* 移动端 */
+@media screen and (max-width: 768px){
+	body, button, input, select, textarea {
+		font: 13px/1.3 "\5FAE\8F6F\96C5\9ED1", "Microsoft Yahei","Hiragino Sans GB", cursive, arial, "\5B8B\4F53";
+		-webkit-font-smoothing: antialiased;margin: 0px;
+	}
+	#all-container {padding-bottom: 283px;}
+	#navFooter {margin-top: -283px;}
+	#all-container.footer-menu {
+		min-width:328px;resize:none;overflow-x: hidden;
+		position: absolute;width: 100%;height:auto;
+	}
+	#all-container.footer-menu {height:calc(100% - 52px);}
+
+	.g-dialog .ly-body {max-height: 420px;overflow-y: auto;}
+}
+
+
+
+/*
+ * Gxzv 小助手
+ */
+#uni-aide {position: fixed;left:20px;bottom:130px;z-index:8;transition: all 0.25s ease;}
+#uni-aide .a-body:hover {opacity: 0.5;}
+#uni-aide .a-body {
+	position: absolute;width: 110px;height: 110px;background: #83CBAC;border-radius: 100%;
+	filter: drop-shadow(2px 4px 4px rgba(0,0,0,0.2));transition: all 0.25s ease;
+}
+#uni-aide .a-body:before,#uni-aide .a-body:after {
+	position: absolute;content: '';
+	width: 20px;height: 30px;background: #83CBAC;
+}
+#uni-aide .a-body:before {left: 2px;border-radius: 100% 0 0 0;transform: rotate(-10deg);}
+#uni-aide .a-body:after {left: 88px;border-radius: 0 100% 0 0;transform: rotate(10deg);}
+#uni-aide .a-body .eyes .eye {
+	width: 30px;height: 30px;
+	background: #fff;border-radius: 100%;
+	position: absolute;top: 28px;left: 18px;
+}
+#uni-aide .a-body .eyes .eye-r {top: 28px;left: 64px;}
+/* 眼珠 */
+#uni-aide .a-body .eyes .eye:before {
+	content: '';width: 20px;height: 20px;
+	background: #555;border-radius: 100%;
+	position: absolute;top: 5px;left: 5px;
+}
+/* 眼皮 */
+#uni-aide .a-body .eyes .eye:after {
+	content: '';position: absolute;width: 30px;height: 20px;top: -18px;
+	background: #83CBAC;border-radius: 5px 5px 0 0;
+	animation: uni-aide-wink 5s infinite 1s;
+}
+/* 嘴巴 */
+#uni-aide .a-body .mouth {
+	overflow: hidden;position: absolute;
+	top: 70px;left: 32px;width: 48px;height: 21px;
+	background: #603335;border-radius: 0 0 100px 100px;transition: all 0.5s ease;
+}
+/* 舌头 */
+#uni-aide .a-body .mouth:before {
+	content: '';position: absolute;left: 18px;top: 10px;
+	width: 40px;height: 20px;background: #F6828C;border-radius: 100%;
+}
+#uni-aide .a-body .teeth {
+	position: relative;top: 70px;left: 40px;
+}
+#uni-aide .a-body .teeth div {position: absolute;width: 7px;height: 10px;background: #fff;}
+#uni-aide .a-body .teeth div:nth-child(1) {border-radius: 0 0 0 100%;}
+#uni-aide .a-body .teeth div:nth-child(2) {left: 25px;border-radius: 0 0 100% 0;}
+/*
+ * 对话框
+ */
+#uni-aide .aide-dialog {
+	display: block;max-width: 420px;height: auto;
+	position: fixed;bottom: 65px;left: 146px;z-index: 8;
+	padding: 8px;border-radius: 8px;
+	color: #fff;font-size: 16px;text-align: left;line-height: 25px;
+	background: #4BB486;filter: drop-shadow(2px 2px 2px rgba(0,0,0,.5));
+}
+#uni-aide .aide-dialog:after {
+	content: '';position: absolute;bottom: -9px;left: 0px;
+	width: 15px;height: 16px;border-radius: 0 0px 100px 0px;
+	background-color: #4BB486;
+}
+/*
+ * 动画
+ */
+@keyframes uni-aide-wink {
+	0% {top:-18px;border-radius:50%}
+	30% {top:0px;border-radius:5px 5px 0 0}
+	60% {top:-18px;border-radius:50%}
+}
+/*
+ * 侧边隐藏
+ */
+#uni-aide.pre-appear {left:-150px;}
+#uni-aide.pre-appear .aide-dialog {bottom: 25px;left: 16px;}
+@media screen and (max-width:768px){
+	#uni-aide {left:10px;bottom:90px;}
+	#uni-aide .a-body {width: 80px;height: 80px;}
+	#uni-aide .a-body:before {left: -2px;}
+	#uni-aide .a-body:after {left: 62px;}
+	#uni-aide .a-body .eyes .eye {width: 24px;height: 24px;top: 19px;left: 11px;}
+	#uni-aide .a-body .eyes .eye-r {top: 19px;left: 45px;z-index: 8;}
+	/* 眼珠 */
+	#uni-aide .a-body .eyes .eye:before {
+		width: 16px;height: 16px;top: 4px;left: 4px;
+	}
+	/* 眼皮 */
+	#uni-aide .a-body .eyes .eye:after {width: 24px;height: 13px;top: -12px;}
+	#uni-aide .a-body .mouth {top: 52px;left: 21px;width: 40px;height: 18px;}
+	#uni-aide .a-body .teeth {top: 52px;left: 27px;}
+	#uni-aide .a-body .teeth div:nth-child(2) {left: 22px;}
+
+	/* 动画 */
+	@keyframes uni-aide-wink {
+		0% {top:-12px;border-radius:50%}
+		30% {top:0px;border-radius:5px 5px 0 0}
+		60% {top:-12px;border-radius:50%}
+	}
+
+	#uni-aide .aide-dialog {font-size: 14px;bottom: 40px;left: 96px;}
+}

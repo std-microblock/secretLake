@@ -1,0 +1,77 @@
+.gmde-container {
+	border: 1px solid rgb(var(--black-5));border-radius: 3px;
+}
+.gmde-input {min-height: 186px;border: none;line-height: 1.3;}
+.gmde-tool-bar {
+	display: flex;align-items: center;padding: 0 8px;
+	border-bottom: 1px solid rgb(var(--black-5));position: relative;
+}
+.gmde-tool-bar .toolBtn {
+	position: relative;top: 0px;
+	display: flex;align-items: center;justify-content: center;
+	max-width: 28px;height: 36px;flex: 10 0 23px;
+	text-align: center;cursor: pointer;font-size:17px;
+	transition: all 0.25s ease;color: rgb(var(--black-4));
+}
+.gmde-tool-bar .toolBtn:hover {transform: rotate(360deg);color: rgb(var(--white));}
+.gmde-tool-bar .toolBtn.btn-hide {display: none;}
+.gmde-tool-bar .toolBtn.gedt-save {position: absolute;right: 12px;}
+
+.gmde-tool-bar .gedt-italic > * {
+	font-style: italic;font-weight: bold;
+	font-family: "Consolas","Courier New","Microsoft Yahei",sans-serif;
+}
+
+.gmde-msg-bar {
+	display: flex;align-items: center;justify-content: space-between;
+	padding: 5px 16px;background-color: rgb(var(--black-14));
+	border-bottom: 1px solid rgb(var(--black-5));font-size:13px;
+	overflow: hidden;
+}
+.gmde-msg-bar .msg-el {position: relative;}
+.gmde-msg-bar .msg-el.before {opacity: 0;left: -100px;}
+
+
+.gmde-vHTML p {display: block;margin: 12px 0;white-space: pre-wrap;word-break: break-all;}
+.gmde-vHTML h1 {font-size:2rem;font-weight: 700;margin: 12px 0;}
+.gmde-vHTML h2 {font-size:1.75rem;font-weight: 600;margin: 12px 0;}
+.gmde-vHTML h3 {font-size:1.5rem;font-weight: 600;margin: 12px 0;}
+.gmde-vHTML .gmd-hr {width: 100%;height: 2px;margin: 32px 0;background: rgb(var(--black-5));}
+.gmde-vHTML em {font-style: italic;}
+.gmde-vHTML img {
+	display: block;margin: 0 auto;
+	max-width: 100%;min-width: 128px;min-height: 128px;
+}
+.gmde-vHTML .gi-darken {margin: 0 auto;}
+.gmde-vHTML a {
+	color: rgb(var(--black-1));padding-bottom: 1px;border-bottom: 2px rgb(var(--black-3)) solid;
+	transition: all 0.25s ease;
+}
+.gmde-vHTML a > .gi {margin-right: 4px;}
+.gmde-vHTML a:hover {border-bottom: 2px rgba(253,253,253,0) solid;}
+.gmde-vHTML .quote-box {
+	display: block;padding: 0.5em 1em;
+	word-break:break-all;white-space: pre-wrap;
+	border-left: 6px solid rgb(var(--black-7));
+}
+
+/* 移动端 */
+@media screen and (max-width: 720px){
+	.gmde-vHTML {font-size: 15px;}
+}
+
+
+
+.gmdea-bg{
+	background: linear-gradient(40deg,transparent,rgb(var(--black-15)),transparent,rgb(var(--black-15)),transparent);
+    background-size: 200% 200%;
+	-webkit-animation:gmdea-bg 1s infinite linear;animation:gmdea-bg 1s infinite linear;
+}
+@-webkit-keyframes gmdea-bg{
+	0% {background-position: 0 50%;}
+	100% {background-position: 100% 50%;}
+}
+@keyframes gmdea-bg{
+	0% {background-position: 0 50%;}
+	100% {background-position: 100% 50%;}
+}

@@ -1,0 +1,1 @@
+require("./src/app.js")(__dirname);
