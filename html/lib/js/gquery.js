@@ -1,6 +1,6 @@
 // =================================================
 //
-// gQuery v1.2.5 under strict (Only 6kb)
+// gQuery v1.2.0 under strict (Only 6kb)
 //
 // Licensed MIT for open source use
 // or gQuery Commercial License for commercial use
@@ -9,12 +9,13 @@
 //
 // [fn]
 // seletor,each,find,parent,remove,empty,text,html
-// val,width,height,offset,prepend,append,before
+// val,width,height,offset,prepend,append,before,after
 // attr,removeAttr,hasClass,addClass,removeClass,toggleClass
-// css,show,hide,fadeIn,fadeOut,on,trigger,click,select
+// css,show,hide,fadeIn,fadeOut,fadeToggle
+// slideUp,slideDown,slideToggle,on,trigger,click,select
 //
 // [extend fn]
-// isArray,uniqueArray,bind,strToNode,copy
+// isArray,uniqueArray,bind,strToNode,copy,deepClone
 // [extend array]
 // unique
 // [extend storage]
@@ -39,7 +40,7 @@
 
 	gQuery.fn = gQuery.prototype = {
 		constructor: gQuery,
-		gquery: '1.2.5',
+		gquery: '1.2.0',
 		init: function(sel,opts){
 			let to = typeof sel,elems = [];
 			switch(to){
@@ -48,7 +49,10 @@
 						document.addEventListener('DOMContentLoaded', sel);
 					}
 					return;
-				case 'object':sel.length===undefined ? elems.push(sel) : elems = sel;break;
+				case 'object':
+					sel.length===undefined ? elems.push(sel) : elems = sel;
+					gQuery.isWindow(sel) && (elems = [window]);
+					break;
 				case 'string':elems = document.querySelectorAll(sel);break;
 			}
 
@@ -64,20 +68,25 @@
 			return this;
 		},
 		find: function(sel){
-			let _this = this,fArr = [];
+			let finder = gQuery.deepClone(this),fArr = [];
 			this.each(function(idx){
-				let elems = this.querySelectorAll(sel);delete _this[idx];
+				let elems = this.querySelectorAll(sel);
 				for (let i = elems.length - 1; i >= 0; i--) {fArr.push(elems[i]);}
 			});
 
 			fArr = gQuery.array.unique(fArr);
-			this.length = fArr.length;let ii = 0;
-			for (let i = fArr.length - 1; i >= 0; i--) {this[i] = fArr[ii];ii++;}
-			return this;
+			finder.length = fArr.length;let ii = 0;
+			for (let i = fArr.length - 1; i >= 0; i--) {finder[i] = fArr[ii];ii++;}
+			return finder;
 		},
 		parent: function(){
 			let _this = this;
 			this.each(function(idx){_this[idx] = this.parentNode;});
+			return this;
+		},
+		next: function(sel){
+			let _this = this;
+			this.each(function(idx){_this[idx] = this.nextElementSibling;});
 			return this;
 		},
 		remove: function(){
@@ -144,6 +153,10 @@
 			elem = gQuery.strToNode(elem);
 			this.each(function(){this.before(elem);});return this;
 		},
+		after: function(elem){
+			elem = gQuery.strToNode(elem);
+			this.each(function(){this.after(elem);});return this;
+		},
 		attr: function(attr,val){
 			if(val === undefined && typeof attr === 'string') {return this[0].getAttribute(attr);} else {
 				if(typeof attr === 'object'){
@@ -175,6 +188,8 @@
 			this.each(function(){this.classList.toggle(cls);});return this;
 		},
 		css: function(styles){
+			if(typeof styles === 'string'){return this[0].style[styles];}
+
 			this.each(function(){
 				for(let style in styles){this.style[style] = styles[style];}
 			});
@@ -192,8 +207,10 @@
 			dur || (dur=500);typeof callback === 'function' || (callback=function(){});
 
 			this.each(function(){
+				if(this.style.display!='' && this.style.display!='none'){return true;}
+
 				this.style.display='block';this.animate([{opacity:0},{opacity:1}],dur);
-				let cthis = this;setTimeout(()=>{callback(cthis);},dur);
+				let cthis = this;setTimeout(()=>{callback.call(cthis);},dur);
 			});
 			return this;
 		},
@@ -203,7 +220,44 @@
 			this.each(function(){
 				this.animate([{opacity:0}],dur);
 
-				let cthis = this;setTimeout(()=>{cthis.style.display = 'none';callback(cthis);},dur);
+				let cthis = this;setTimeout(()=>{cthis.style.display = 'none';callback.call(cthis);},dur);
+			});
+			return this;
+		},
+		fadeToggle: function(dur,callback){
+			dur || (dur=500);typeof callback === 'function' || (callback=function(){});
+
+			this.each(function(){
+				this.style.display=='none' ? $(this).fadeIn(dur,callback) : $(this).fadeOut(dur,callback);
+			});
+			return this;
+		},
+		slideUp: function(dur,callback){
+			dur || (dur=500);typeof callback === 'function' || (callback=function(){});
+
+			this.each(function(){
+				this.animate([{height:this.offsetHeight+'px'},{height:'0px'}],dur);
+
+				let cthis = this;setTimeout(()=>{cthis.style.display = 'none';callback.call(cthis);},dur);
+			});
+			return this;
+		},
+		slideDown: function(dur,callback){
+			dur || (dur=500);typeof callback === 'function' || (callback=function(){});
+
+			this.each(function(){
+				this.style.display = '';let elH = this.offsetHeight+'px';
+				this.animate([{height:'0px'},{height:elH}],dur);
+
+				let cthis = this;setTimeout(()=>{callback.call(cthis);},dur);
+			});
+			return this;
+		},
+		slideToggle: function(dur,callback){
+			dur || (dur=500);typeof callback === 'function' || (callback=function(){});
+
+			this.each(function(){
+				this.style.display=='none' ? $(this).slideDown(dur,callback) : $(this).slideUp(dur,callback);
 			});
 			return this;
 		},
@@ -224,7 +278,12 @@
 			return this;
 		},
 		click: function(fn){
-			this.each(function(){gQuery.bind(this,'click',fn);});return this;
+			if(typeof fn === 'function'){
+				this.each(function(){gQuery.bind(this,'click',fn);});
+			} else {
+				this.trigger('click');
+			}
+			return this;
 		},
 		select: function(){
 			switch(this[0].tagName){
@@ -236,11 +295,12 @@
 	};
 	gQuery.fn.init.prototype = gQuery.fn;
 
-	gQuery.extend = gQuery.fn.extend = function(obj){
-		for(let idx in obj){this[idx] = obj[idx];}
-	};
+	gQuery.extend = function(obj){for(let idx in obj){this[idx] = obj[idx];}};
 	gQuery.extend({
 		global: (typeof window !== 'undefined' ? window : global),
+		isWindow: function(obj){
+			return Object.prototype.toString.call(obj)==='[object Window]';
+		},
 		array: {
 			unique: function(arr){
 				let j = {};
@@ -274,6 +334,16 @@
 			$('body').append("<textarea id='gQuery-copyTemp'>"+str+"</textarea>");
 			$('#gQuery-copyTemp').select();document.execCommand("Copy");
 			$('#gQuery-copyTemp').remove();
+		},
+		deepClone: function(obj){
+			let copy = Object.create(Object.getPrototypeOf(obj)),
+			propNames = Object.getOwnPropertyNames(obj);
+
+			propNames.forEach(function(name) {
+				let desc = Object.getOwnPropertyDescriptor(obj, name);
+				Object.defineProperty(copy, name, desc);
+			});
+			return copy;
 		},
 		storage: {
 			local: function(){return $.global.localStorage},

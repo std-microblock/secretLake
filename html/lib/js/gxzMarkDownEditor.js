@@ -1,5 +1,5 @@
 // ==================================================
-// GXZMarkDownEditor v1.0.5 (GMDE)
+// GXZMarkDownEditor v1.2.0 (GMDE)
 // 
 // 采用 GPLv3 许可证供开源使用
 // 或用于商业用途的 GMDE 商业许可证
@@ -20,7 +20,7 @@
 	typeof define === 'function' && define.amd ? define(factory) :
 	(global = window || self, global.geditor = factory());
 
-	console.log('%c gxzMarkDownEditor %c https://ganxiaozhe.com \n','color: #fff; background: #030307; padding:5px 0; margin-top: 1em;','background: #efefef; color: #333; padding:5px 0;');
+	console.log('%c gxzMarkDownEditor v1.0.7 %c https://ganxiaozhe.com \n','color: #fff; background: #030307; padding:5px 0; margin-top: 1em;','background: #efefef; color: #333; padding:5px 0;');
 }(gQuery,function(){
 	'use strict';
 	var geditor = function(id,opts){
@@ -57,7 +57,18 @@
 			this.msg = $('#'+this.id).find('.gmde-msg-bar');
 			this.preview = '';
 			this.length = {max:-1,min:0};
+			// 默认自动保存
 			this.autoSave = {sec:30};
+			// 默认关闭上传功能
+			this.upload = {
+				img:{allow:false,maxLen:20,maxSize:1024*1024,act:'gmde'}
+			};
+			this.upImgs = [];
+
+			this.oss = {
+				accessid:"",accesskey:"",host:"",policyBase64:"",signature:"",
+				callbackbody:"",filename:"",key:"",expire:0,now: Date.parse(new Date()) / 1000
+			};
 
 			var updateHandle = function(){
 				_this.updateHandle();
@@ -100,8 +111,8 @@
 			});
 			$('.gmde-tool-bar .gedt-url').click(()=>{
 				var selection = _this.getSelection();
-				_dialogBox({
-					title:'添加超链接',message:"<input class='form-fluid' id='mgedt-url' value='https://'/><input class='form-fluid mt-2' id='mgedt-urlName' placeholder='链接名' value='"+selection+"'/>",
+				gxz.alert({
+					title:'添加超链接',message:"<input class='gl-form fluid' id='mgedt-url' value='https://'/><input class='gl-form fluid mt-2' id='mgedt-urlName' placeholder='链接名' value='"+selection+"'/>",
 					yes:function(){
 						var url = {url:$('#mgedt-url').val(),name:$('#mgedt-urlName').val()};
 						if(!url.url){return;}
@@ -113,40 +124,237 @@
 			});
 			$('.gmde-tool-bar .gedt-img').click(()=>{
 				var selection = _this.getSelection();
-				_dialogBox({
-					title:'添加图片',message:"<input class='form-fluid' id='mgedt-img' value='https://'/><input class='form-fluid mt-2' id='mgedt-imgAlt' placeholder='图片介绍' value='"+selection+"'/>",
+				gxz.alert({
+					title:"<span class='mgedtNav-img' data-type='url'>添加网络图片</span><span class='mgedtNav-img' data-type='upload'>上传本地图片</span>",
+					message:"<div id='mgedtExt-imgURL'><input class='gl-form fluid' id='mgedt-img' value='https://'/><input class='gl-form fluid mt-2' id='mgedt-imgAlt' placeholder='图片介绍' value='"+selection+"'/></div>"+
+					"<div id='mgedtExt-imgUpload'><div class='ge-fileup'>"+
+						"<div class='picup-tip'>"+
+							"<i class='gi icon-picfill'></i>"+
+							"<div class='mark-file-tip'>将图片拖拽到此，或单击直接上传</div>"+
+						"</div>"+
+						"<input type='file' id='mgedt-imgUpload' class='btn-fileup' />"+
+					"</div><div id='mgedtExt-imgUpPre'>"+
+					"</div></div>",
 					yes:function(){
 						var img = {url:$('#mgedt-img').val(),alt:$('#mgedt-imgAlt').val()};
 						if(!img.url){return;}
 						img.alt || (img.alt=img.url);
+
+						let tpye = $('.g-dialog .mgedtNav-img.active').attr('data-type');
+						if(tpye=='upload'){return false;}
 
 						if(!/\.(gif|jpg|jpeg|png|GIF|JPEG|JPG|PNG)$/.test(img.url)){
 							_this.pushSelection("!["+img.alt+"]("+img.url+")");
 							_this.pushMsg("该链接看起来不像是图片，请检查它是否能正常加载",'new');return false;
 						}
 
-						var il_ = new Image();
-						il_.alt = img.alt;
-						il_.src = img.url;
-						_this.pushMsg("正在解析图片 "+img.url,'new');
-
-						if(il_.complete){
-							_this.pushSelection("!["+il_.alt+"]("+il_.src+" size='"+il_.width+"px,"+il_.height+"px')");
-							_this.pushMsg("图片解析成功！已为其自动添加尺寸信息",'new');
-						} else {
-							il_.onerror = function(){
-								_this.pushMsg("图片 "+il_.src+" 资源无法访问，解析失败！",'new');
-								il_.onload = null;
-							};
-
-							il_.onload = function(){
-								_this.pushSelection("!["+il_.alt+"]("+il_.src+" size='"+il_.width+"px,"+il_.height+"px')");
-								_this.pushMsg("图片解析成功！已为其自动添加尺寸信息",'new');
-							}
-						} // 获取图片尺寸 - END
+						mgedtExt.imgAdd(img.url,img.alt);
 					}
 				});
+
+				$('.g-dialog .mgedtNav-img').click(function(){
+					if( $(this).hasClass('active') ){return true;}
+
+					t.type = $(this).attr('data-type');
+					$('.g-dialog .mgedtNav-img').removeClass('active');
+					$(this).addClass('active');
+
+					if(t.type=='url'){
+						$('#mgedtExt-imgUpload').hide();$('#mgedtExt-imgURL').show();
+					} else {
+						if(!_this.upload.img.allow){
+							gxz.alert({title:'提示',message:'Sorry，该页面不允许上传本地图片！'});
+							$('.g-dialog .mgedtNav-img[data-type="url"]').click();
+							return false;
+						}
+						$('#mgedtExt-imgURL').hide();$('#mgedtExt-imgUpload').show();
+					}
+				});
+				$('.g-dialog .mgedtNav-img[data-type="url"]').click();
+
+				// 图片上传操作
+				$('#mgedt-imgUpload').on('change',function(){
+					let files = this.files;
+					let i,names = [];
+					for (i = 0; i < _this.upImgs.length; i++) {
+						names.push( _this.upImgs[i].name );
+					}
+					for (i = 0; i < files.length; i++) {
+						if ( jQuery.inArray(files[i].name,names) > -1 ) {
+							gxz.alert({title:'提示',message:'Oooooops，请不要重复上传相同图片！'});continue;
+						}
+						if ( !/image\/\w+/.test(files[i].type) ) {
+							gxz.alert({title:'提示',message:'Oooooops，只接受图片格式文件噢！'});continue;
+						}
+
+						mgedtExt.imgHandle(files[i]);
+					} // for END
+					$('#mgedt-imgUpload').val('');
+				});
+				// 显示之前上传的图片
+				mgedtExt.imgPreview();
 			});
+			let mgedtExt = {
+				imgAdd(url,alt){
+					alt || (alt = url);
+					let il_ = new Image();
+					il_.alt = alt;
+					il_.src = url;
+					_this.pushMsg("正在解析图片 "+url,'new');
+
+					if(il_.complete){
+						_this.pushSelection("!["+il_.alt+"]("+il_.src+" size='"+il_.width+"px,"+il_.height+"px')");
+						_this.pushMsg("图片解析成功！已为其自动添加尺寸信息",'new');
+					} else {
+						il_.onerror = function(){
+							_this.pushMsg("图片 "+il_.src+" 资源无法访问，解析失败！",'new');
+							il_.onload = null;
+						};
+
+						il_.onload = function(){
+							_this.pushSelection("!["+il_.alt+"]("+il_.src+" size='"+il_.width+"px,"+il_.height+"px')");
+							_this.pushMsg("图片解析成功！已为其自动添加尺寸信息",'new');
+						}
+					} // 获取图片尺寸 - END
+				},
+				imgHandle(file){
+					if(!_this.upload.img.allow){
+						gxz.alert({title:'提示',message:'Sorry，该页面不允许上传本地图片！'});return false;
+					}
+					if((_this.upImgs.length+1) > _this.upload.img.max){
+						gxz.alert({title:'提示',message:'Sorry，你上传的图片数量已超过该页面的最大限制！'});return false;
+					}
+
+					if(typeof file != 'object') {return false;}
+					let fr = new FileReader();
+					fr.readAsDataURL(file);
+					fr.onload = function(e) {
+						if(file.size > 1572864 && file.type=="image/gif"){
+							gxz.alert({title:'添加失败',message:'该 gif 大于 1.5MB ，请换图重试！'});return;
+						}
+						// 若为 gif 且小于 1.5M 直接上传
+						if(file.size <= 1572864 && file.type=="image/gif") {
+							mgedtExt.imgPreUpload(file);return;
+						}
+
+						mgedtExt.dealImage(this.result, { quality: 0.7 }, function(base) {
+							var blob = mgedtExt.dataURLtoBlob(base);
+							var nfile = new File([blob], file.name, { type: file.type });
+
+							if(nfile.size > _this.upload.img.maxSize ){
+								var nsize = {};
+								nsize.kb = (nfile.size / 1024).toFixed(2);
+								nsize.okb = (_this.upload.img.maxSize / 1024).toFixed(2);
+								gxz.alert({title:'添加失败',message:'该图片压缩后 '+nsize.kb+'KB 依然大于 '+nsize.okb+'KB ，请换图重试！'});return;
+							}
+
+							mgedtExt.imgPreUpload(nfile);
+						});
+					} // fileReader END
+				},
+				imgPreUpload(file){
+					let fi = {};fi.idx = _this.upImgs.length;
+					// 显示loading
+					$('#mgedtExt-imgUpPre').prepend("<div class='gep-preview loading' data-loadid='"+fi.idx+"'><div class='gep-img'></div><div class='gep-detail'><div class='gep-size'><span>图片上传中...</span></div><div class='gep-name'><span>"+file.name+"</span></div><div class='gep-opts'><i class='gi icon-cw ga-spin'></i></div></div></div>");
+
+					// 上传图片
+					_this.oss_uploadFile('img',file,function(status,url){
+						$('#mgedtExt-imgUpPre .gep-preview[data-loadid='+fi.idx+']').remove();
+						if(status!='success'){
+							gxz.alert({title:'提示',message:"图片"+file.name+"上传失败！"});return false;
+						}
+
+						file.URL = 'https://mcadmin-img.oss-cn-hangzhou.aliyuncs.com/'+url;
+						mgedtExt.imgAdd(file.URL,file.name);
+						_this.upImgs.push( file );
+						mgedtExt.imgPreview( _this.upImgs.length - 1 );
+					});
+				},
+				imgPreview(snum){
+					let t = {},i,fr,files = [];
+					if( typeof snum == 'number' ){
+						files.push( _this.upImgs[snum] );
+					} else {
+						files = _this.upImgs;
+						$('#mgedtExt-imgUpPre .gep-preview').remove();
+					}
+
+					for (i = 0; i < files.length; i++) {
+						typeof snum == 'number' ? t.sn = snum : t.sn = i;
+						fr = new FileReader();
+						fr.readAsDataURL(files[i]);
+						fr.onload = (function(sn) {
+							return function(e){
+								let fi = {},file = _this.upImgs[sn];
+								fi.kb = (file.size / 1024).toFixed(2);
+								t.h = "<div class='gep-preview' data-id='"+sn+"'><div class='gep-img'><img src='"+this.result+"'></div><div class='gep-detail'><div class='gep-size'><span>"+fi.kb+" KB</span></div><div class='gep-name'><span>"+file.name+"</span></div><div class='gep-opts'><i class='gi icon-indent-right opt-add' title='添加'></i> <i class='gi icon-delete' title='删除'></i></div></div></div>";
+								$('#mgedtExt-imgUpPre').prepend(t.h);
+
+								mgedtExt.imgOptsBind();
+							}
+						})(t.sn); //传入序号
+					}
+				},
+				imgOptsBind(){
+					$('#mgedtExt-imgUpPre .gep-preview .gep-opts > .opt-add:not([data-bind="yes"])').click(function(){
+						t.prt = $(this).parent().parent().parent();
+						t.id = t.prt.attr('data-id');
+						
+						mgedtExt.imgAdd(_this.upImgs[t.id].URL,_this.upImgs[t.id].name);
+					}).attr("data-bind","yes");
+					$('#mgedtExt-imgUpPre .gep-preview .gep-opts > .icon-delete:not([data-bind="yes"])').click(function(){
+						t.prt = $(this).parent().parent().parent();
+						t.id = t.prt.attr('data-id');
+						_this.upImgs.splice(t.id, 1);
+						mgedtExt.imgPreview();
+					}).attr("data-bind","yes");
+				},
+				dealImage(path, obj, callback){
+					let img = new Image();
+					img.src = path;
+					img.onload = function() {
+						var that = this;
+						// 默认按比例压缩
+						var w = that.width,h = that.height,scale = w / h;
+						w = obj.width || w;
+						h = obj.height || (w / scale);
+						var quality = obj.quality || 0.7; // 默认图片质量为0.7
+
+						//生成canvas
+						var canvas = document.createElement('canvas');
+						var ctx = canvas.getContext('2d');
+						// 创建属性节点
+						var anw = document.createAttribute("width");
+						anw.nodeValue = w;
+						var anh = document.createAttribute("height");
+						anh.nodeValue = h;
+						canvas.setAttributeNode(anw);
+						canvas.setAttributeNode(anh);
+						ctx.drawImage(that, 0, 0, w, h);
+
+						// 图像质量
+						if (obj.quality && obj.quality <= 1 && obj.quality > 0) {
+							quality = obj.quality;
+						}
+						// quality值越小，所绘制出的图像越模糊
+						var base64 = canvas.toDataURL('image/jpeg', quality);
+						// 回调函数返回base64的值
+						callback(base64);
+					}
+				},
+				dataURLtoBlob(dataurl){
+					var arr = dataurl.split(','),
+					mime = arr[0].match(/:(.*?);/)[1],
+					bstr = atob(arr[1]),
+					n = bstr.length,
+					u8arr = new Uint8Array(n);
+					while (n--) {
+					u8arr[n] = bstr.charCodeAt(n);
+					}
+					return new Blob([u8arr], { type: mime });
+				}
+			};
+
 			$('.gmde-tool-bar .gedt-video').click(()=>{
 				var selection = _this.getSelection();
 				t.val = _this.input.val();
@@ -154,13 +362,13 @@
 				endSel = t.val.charAt(endSel-1);
 
 				t.str = ( endSel=='\n' || t.val=='' ? '[bilibili]' : '\n[bilibili]' );
-				_dialogBox({
-					title:'添加视频',message:"<select class='form-fluid'><option value='bilibili'>bilibili</option></select><input class='form-fluid mt-2' id='mgedt-videoUrl' placeholder='iframe src 链接' value='"+selection+"'/>",
+				gxz.alert({
+					title:'添加视频',message:"<select class='gl-form fluid'><option value='bilibili'>bilibili</option></select><input class='gl-form fluid mt-2' id='mgedt-videoUrl' placeholder='iframe src 链接' value='"+selection+"'/>",
 					yes:function(){
 						var url = $('#mgedt-videoUrl').val();
 						if(!url){return;}
 						if(url.indexOf('player.bilibili.com')<0){
-							_dialogBox({title:'提示',message:"<p>请输入正确的视频 iframe 链接！</p><br/><p>bilibili 视频嵌入链接请在三连旁的分享中找到<b>嵌入代码</b>，复制 iframe src 中的链接。</p>"});return false;
+							gxz.alert({title:'提示',message:"<p>请输入正确的视频 iframe 链接！</p><br/><p>bilibili 视频嵌入链接请在三连旁的分享中找到<b>嵌入代码</b>，复制 iframe src 中的链接。</p>"});return false;
 						}
 
 						_this.pushSelection(t.str+url+'[/bilibili]');
@@ -176,7 +384,7 @@
 		},
 		set: function(opts){
 			opts = opts || {};
-			var _this = this;
+			var _this = this;let temp;
 			if($('#'+this.id).length<1){return false;}
 
 			if(opts.preview){
@@ -193,7 +401,7 @@
 				this.autoSave.name = (opts.autoSave.name ? opts.autoSave.name : 'gxzMarkDownEditor' );
 				typeof opts.autoSave.load !== 'number' && (opts.autoSave.load = 1);
 				if(opts.autoSave.name){
-					var lastSave = gxz.storage.read(opts.autoSave.name);
+					var lastSave = $.storage.read(opts.autoSave.name);
 					if(opts.autoSave.load==1 && lastSave){
 						this.input.val(lastSave);
 						this.pushMsg('上次数据加载成功','new');
@@ -206,6 +414,16 @@
 				opts.autoSave.time && (this.autoSave.sec = opts.autoSave.time);
 			}
 
+			if(typeof opts.upload === 'object'){
+				if(typeof opts.upload.img === 'object'){
+					temp = opts.upload.img;
+					typeof temp.allow === 'undefined' || (this.upload.img.allow = temp.allow);
+					typeof temp.maxLen === 'undefined' || (this.upload.img.maxLen = temp.maxLen);
+					typeof temp.maxSize === 'undefined' || (this.upload.img.maxSize = temp.maxSize);
+					typeof temp.act === 'undefined' || (this.upload.img.act = temp.act);
+				}
+			}
+
 			return this;
 		},
 		updateSecHandle: function(){
@@ -213,8 +431,8 @@
 			if(this.autoSave.time){
 				this.autoSave.sec--;
 
-				if(this.autoSave.sec<=0){
-					gxz.storage.write(this.autoSave.name,this.input.val());
+				if(this.autoSave.sec<=0 && this.input.val().length>0){
+					$.storage.write(this.autoSave.name,this.input.val());
 					this.autoSave.sec = this.autoSave.time;
 					this.pushMsg('已为你自动保存 - '+gxz.date.time,'new');
 				}
@@ -247,12 +465,11 @@
 			}
 
 			_this.msg.addClass('gmdea-bg');
-			_this.msg.find('.msg-el').animate({opacity:0,left:'-100px'},400,function(){
-				_this.msg.html('<div class="msg-el before">'+str+'</div>');
-				_this.msg.find('.msg-el.before').animate({opacity:1,left:'0px'},300,function(){
-					_this.msg.removeClass('gmdea-bg');
-				});
-			});
+			_this.msg.find('.msg-el').css({'opacity':0}).html(str);
+			setTimeout(()=>{
+				_this.msg.find('.msg-el').css({'opacity':1});
+				_this.msg.removeClass('gmdea-bg');
+			},400);
 			return _this;
 		},
 		previewHandle: function(opts){
@@ -263,46 +480,100 @@
 			}
 
 			t.txt = _this.input.val().replace(/</g,'&lt;').replace(/>/g,'&gt;');
+			if(opts && opts.act=='inline'){
+				_this.preview.html( _this.toHtmlHandle(t.txt,'inline') );return;
+			}
 
-			var cells = t.txt.split('\n');
-			t.codeMatch = 0;t.quoteMatch = 0;
+			let cells = t.txt.split('\n');
+			let mat = {
+				code:0,codeArr:[],
+				quote:0,quoteArr:[],
+				list:0,olist:0
+			};
+			let matToHtml = function(str){
+				// 行内样式
+				let inStr = _this.toHtmlHandle(str,'inline');
+				// 所有
+				str = _this.toHtmlHandle(str);
+
+				if(str.length<1){str = '<br>';} else if(str==inStr){
+					str = '<p>'+str+'</p>';
+				}
+				return str;
+			}
 			for (i = 0; i < cells.length; i++) {
-				if(t.quoteMatch==1){
-					if(cells[i] != '&gt;&gt;&gt;'){
-						cells[i] = _this.toHtmlHandle(cells[i]);
-						cells[i]+='<br>';continue;
+				// 引用
+				if(mat.quote==1){
+					if(cells[i] == '&gt;&gt;&gt;'){
+						cells[i] = '<div class="quote-box">'+mat.quoteArr.join('')+'</div>';mat.quote = 0;
+					} else {
+						t.temp = matToHtml(cells[i]);mat.quoteArr.push(t.temp);cells[i]='';
 					}
-					cells[i] = '</div>';
-					t.quoteMatch = 0;continue;
+					continue;
 				}
-				t.mQuote = cells[i].match(/^(?:&gt;&gt;&gt;.*?)/);
-				if(t.mQuote !== null){
-					cells[i] = '<div class="quote-box">';
-					t.quoteMatch = 1;continue;
-				}
+				if(cells[i] == '&gt;&gt;&gt;'){mat.quoteArr=[];mat.quote = 1;cells[i]='';continue;}
 
-				if(t.codeMatch==1){
-					if(cells[i] != '```'){cells[i]+='<br>';continue;}
-					cells[i] = '</pre>';
-					t.codeMatch = 0;continue;
+				// 代码块
+				if(mat.code==1){
+					if(cells[i] == '```'){
+						cells[i] = '</pre>';mat.code = 0;
+					} else {cells[i]+='<br>';}
+					continue;
 				}
 				t.mCode = cells[i].match(/^(?:```.*?)/);
 				if(t.mCode !== null){
 					t.codeLang = cells[i].replace(/```/,'');
 					cells[i] = '<pre class="gcode-autoParse" data-lang="'+t.codeLang+'">';
-					t.codeMatch = 1;continue;
+					mat.code = 1;continue;
 				}
 
-				// 所有行内样式
-				t.oldCell = _this.toHtmlHandle(cells[i],'inline');
+				// 列表 *
+				t.mList = cells[i].match(/^(?: {0,8}\* .*?)/);
+				if(mat.list==1){
+					if(cells[i].length<1){continue;}
 
-				cells[i] = _this.toHtmlHandle(cells[i]);
-
-				if(cells[i].length<1){
-					cells[i] = '<br>';
-				} else if(cells[i]==t.oldCell){
-					cells[i] = '<p>'+cells[i]+'</p>';
+					if(t.mList !== null ){
+						t.mList = cells[i].match(/^(?: {2,}\* .*?)/);
+						cells[i] = _this.toHtmlHandle( cells[i].replace('* ',''),'inline' );
+						if(t.mList !== null ){
+							cells[i] = '<li class="child">'+cells[i]+'</li>';
+						} else {
+							cells[i] = '<li>'+cells[i]+'</li>';
+						}
+					} else {
+						cells[i-1] += '</ul>';mat.list = 0;cells[i] = matToHtml(cells[i]);
+					}
+					continue;
 				}
+				if(t.mList !== null){
+					cells[i] = '<ul><li>'+_this.toHtmlHandle( cells[i].replace('* ',''),'inline' )+'</li>';
+					mat.list = 1;continue;
+				}
+
+				// 列表 -
+				t.mList = cells[i].match(/^(?: {0,8}\- .*?)/);
+				if(mat.olist==1){
+					if(cells[i].length<1){continue;}
+
+					if(t.mList !== null ){
+						t.mList = cells[i].match(/^(?: {2,}\- .*?)/);
+						cells[i] = _this.toHtmlHandle( cells[i].replace('- ',''),'inline' );
+						if(t.mList !== null ){
+							cells[i] = '<li class="child">'+cells[i]+'</li>';
+						} else {
+							cells[i] = '<li>'+cells[i]+'</li>';
+						}
+					} else {
+						cells[i-1] += '</ol>';mat.olist = 0;cells[i] = matToHtml(cells[i]);
+					}
+					continue;
+				}
+				if(t.mList !== null){
+					cells[i] = '<ol><li>'+_this.toHtmlHandle( cells[i].replace('- ',''),'inline' )+'</li>';
+					mat.olist = 1;continue;
+				}
+
+				cells[i] = matToHtml(cells[i]);
 			}
 
 			_this.preview.html( cells.join("").replace(/<br><\/pre>/g,'</pre>') );
@@ -316,12 +587,15 @@
 				h1: new RegExp("^#{1} (.*)$"),
 				h2: new RegExp("^#{2} (.*)$"),
 				h3: new RegExp("^#{3} (.*)$"),
+				h4: new RegExp("^#{4} (.*)$"),
+				h5: new RegExp("^#{5} (.*)$"),
 				hr: new RegExp("^-{4,}$"),
 				bold: new RegExp("\\*{2}([^*].*?)\\*{2}",'g'),
 				italic: new RegExp("\\*{1}([^*].*?)\\*{1}",'g'),
 				noun: new RegExp("`{1,2}([^`].*?)`{1,2}",'g'),
-				img: new RegExp("!\\[([^'\"\\s]*?)\\]\\((.*?)\\)",'g'),
-				url: new RegExp("\\[([^'\"\\s]*?)\\]\\((.*?)\\)",'g'),
+				img: new RegExp("!\\[([^'\"]*?)\\]\\((.*?)\\)",'g'),
+				url_img: new RegExp("\\[(<img.*?)\\]\\((.*?)\\)",'g'),
+				url: new RegExp("\\[([^\\n]*?)\\]\\((.*?)\\)",'g'),
 				bilibili: new RegExp("^\\[bilibili\\](.*?)\\[\/bilibili\\]$"),
 			},_t = {};
 
@@ -333,7 +607,9 @@
 				return str;
 			}
 
-			str = str.replace(_pre.h3,'<h3>$1</h3>')
+			str = str.replace(_pre.h5,'<h5>$1</h5>')
+				.replace(_pre.h4,'<h4>$1</h4>')
+				.replace(_pre.h3,'<h3>$1</h3>')
 				.replace(_pre.h2,'<h2>$1</h2>')
 				.replace(_pre.h1,'<h1>$1</h1>')
 				.replace(_pre.hr,'<div class="gmd-hr"></div>')
@@ -341,9 +617,10 @@
 				.replace(_pre.italic,'<em>$1</em>')
 				.replace(_pre.noun,'<span class="code-text">$1</span>')
 				.replace(_pre.img,'<img alt="$1" data-gisrc="$2" data-gazeimg>')
+				.replace(_pre.url_img,'<a href="$2" target="_blank">$1</a>')
 				.replace(_pre.url,'<a href="$2" target="_blank"><i class="gi icon-weibiaoti-"></i>$1</a>');
 
-			_t.preW = this.preview[0].offsetWidth;
+			_t.preW = this.preview.width();
 			_t.videoW = (_t.preW>1024 ? 1024 : _t.preW);_t.videoH = Math.floor(_t.videoW/1.48);
 			str = str.replace(_pre.bilibili,'<iframe src="$1" class="gmd-video" scrolling="no" border="0" frameborder="no" framespacing="0" allowfullscreen="true" width="'+_t.videoW+'" height="'+_t.videoH+'"> </iframe>');
 			return str;
@@ -381,6 +658,73 @@
 			_this.updateHandle();
 
 			return this;
+		},
+		oss_uploadFile: function(type,file,callback){
+			if(!(file instanceof File)){return 'notFile';}
+			var _this = this,oss = this.oss;
+			_this.oss_getSignature(_this.upload[type].act);
+			if(oss.status=='fail') {return false;}
+
+			let request = new FormData(),t = {};
+			request.append("key", oss.key + '${filename}'); // 路径
+			request.append("policy", oss.policyBase64); // policy规定了请求的表单域的合法性
+			request.append("OSSAccessKeyId", oss.accessid);
+			request.append("success_action_status", '200'); // 让服务端返回200,不然，默认会返回204
+			request.append("callback", oss.callbackbody);
+			request.append("signature", oss.signature); // OSS验证该签名信息从而验证该Post请求的合法性
+
+			request.append('file', file);
+			$.ajax({
+				type: "POST",url: oss.host,
+				data: request,dataType:"json",
+				cache: false,processData: false,contentType: false,
+			}).done(function(response){
+				t.url = oss.key+file.name;
+				callback('success',t.url);
+			}).fail(function(error) {
+				console.log(error.responseText);
+				callback('failure');
+			});
+		},
+		oss_getSignature: function(act,force){
+			var _this = this;let oss = _this.oss;
+			act || (act = _this.upload.img.act);
+			if(arguments.length < 2){force = false;}
+			oss.now = Date.parse(new Date()) / 1000; 
+			if (oss.expire < oss.now + 3 || force==true) {
+				let body = _this.send_request(act);
+				let obj;
+				try{obj = JSON.parse(body);} catch(err){
+					gxz.alert({title:'出错啦！',message:body});return false;
+				}
+				if( obj.status && obj.status!='success' ){
+					oss.status = obj['status'];_this.oss = oss;
+					gxz.alert({title:'错误代码: '+oss.status,message:obj.reason});return false;
+				}
+				oss.status = 'success';
+				oss.host = obj['host'],
+				oss.policyBase64 = obj['policy'],
+				oss.accessid = obj['accessid'],
+				oss.signature = obj['signature'],
+				oss.expire = parseInt(obj['expire']),
+				oss.callbackbody = obj['callback'],
+				oss.key = obj['dir'];
+				_this.oss = oss;
+				return true;
+			}
+			return false;
+		},
+		send_request(act){
+			let xmlhttp = null;
+			if (window.XMLHttpRequest){xmlhttp=new XMLHttpRequest();} else if (window.ActiveXObject){
+				xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+			}
+			if (xmlhttp!=null){
+				let serverUrl = '/lib/sdk/ali-oss/get.php?action='+act;
+				xmlhttp.open( "GET", serverUrl, false );
+				xmlhttp.send( null );
+				return xmlhttp.responseText;
+			} else {alert("你的浏览器不支持 XMLHTTP.");}
 		}
 	};
 	geditor.fn.init.prototype = geditor.fn;

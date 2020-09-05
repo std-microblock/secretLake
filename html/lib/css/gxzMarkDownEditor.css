@@ -1,7 +1,13 @@
 .gmde-container {
 	border: 1px solid rgb(var(--black-5));border-radius: 3px;
 }
-.gmde-input {min-height: 186px;border: none;line-height: 1.3;}
+.gmde-input {
+	min-height: 186px;border: none;line-height: 1.3;
+	display: block;width: 100%;padding: 10px;font-size: 15px;
+	box-sizing: border-box;outline: 0;border-radius: 4px;
+	line-height: 1;font-family: inherit;resize: vertical;
+	background-color: inherit;color: inherit;
+}
 .gmde-tool-bar {
 	display: flex;align-items: center;padding: 0 8px;
 	border-bottom: 1px solid rgb(var(--black-5));position: relative;
@@ -28,19 +34,87 @@
 	border-bottom: 1px solid rgb(var(--black-5));font-size:13px;
 	overflow: hidden;
 }
-.gmde-msg-bar .msg-el {position: relative;}
+.gmde-msg-bar .msg-el {position: relative;transition: opacity 0.4s ease;}
 .gmde-msg-bar .msg-el.before {opacity: 0;left: -100px;}
 
+/*
+ * GMDE DIALOG 附属
+*/
+.g-dialog [class^=mgedtNav-] {cursor: pointer;}
+.g-dialog .active[class^=mgedtNav-] {font-weight: 600;}
+.ge-fileup {position: relative;border: 2px dashed #dfdfdf;border-radius: 5px;padding: 20px 20px;transition: all 0.3s ease;}
+.ge-fileup .btn-fileup {opacity: 0;position: absolute;top: 0px;left: 0px;height: 100%;width: 100%;cursor: copy;}
+.ge-fileup .picup-tip {padding: 1rem 0.5rem;text-align: center;}
+.ge-fileup .picup-tip > .gi {display: block;font-size: 3rem;margin-bottom:0.3rem;}
 
+.gep-preview {
+	position: relative;display: inline-block;width: 120px;min-height: 100px;vertical-align: top;margin: 16px;
+}
+.gep-preview > * {transition: all 0.25s ease;}
+.gep-preview .gep-img {border-radius: 10px;overflow: hidden;width: 120px;height: 120px;position: relative;display: block;}
+.gep-preview.loading .gep-img {background-color: rgba(0,0,0,0.3);}
+.gep-preview .gep-img img {display: block;width: 100%;height: 100%;object-position: center;object-fit: cover;}
+.gep-preview .gep-detail {
+	z-index: 1;position: absolute;top: 0;left: 0;opacity: 0;
+	min-width: 100%;max-width: 100%;font-size: 13px;line-height: 150%;
+	padding: 2em 1em;text-align: center;color: rgba(0,0,0,0.9);
+}
+.gep-detail .gep-size {font-size: 15px;}
+.gep-detail .gep-name {overflow: hidden;margin-top: .8rem;}
+.gep-detail .gep-opts {color:#fff;font-size:14px;margin-top: .4rem;}
+.gep-detail .gep-opts .gi {cursor:pointer;}
+.gep-detail span {background-color: rgba(255,255,255,0.4);color: rgba(0,0,0,0.9);padding: 0 0.4em;border-radius: 3px;white-space: pre;}
+.gep-detail .gep-name:hover {overflow: visible;z-index:2;}
+.gep-detail span:hover {background-color: rgba(255,255,255,0.9);border: 1px solid transparent;}
+
+.gep-preview:hover .gep-img img {filter: blur(4px) brightness(0.8);}
+.gep-preview:hover .gep-detail,.gep-preview.loading .gep-detail {opacity: 1;}
+
+/*
+ * 表单类
+ */
+.gl-form {
+	display: inline-block;width: auto;height: auto;padding: 6px 12px;
+	font-size: 14px;line-height: 1.42857143;color: #555;
+	background-color: #fff;background-image: none;border: 1px solid #ccc;border-radius: 4px;
+	-webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075);
+	box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075);
+	transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
+	resize: none;
+}
+.gl-form.fluid {
+	display: block;width: 100%;padding: 10px;outline: 0;
+	background-color: inherit;border: 1px solid rgb(var(--black-5));color: inherit;
+}
+.gl-form:focus {
+	border-color: #66afe9;outline: 0;
+	-webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px rgba(102, 175, 233, .6);
+		box-shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px rgba(102, 175, 233, .6);
+}
+.gl-form::-moz-placeholder {color: #999;opacity: 1;}
+.gl-form:-ms-input-placeholder {color: #999;}
+.gl-form::-webkit-input-placeholder {color: #999;}
+
+.gl-form.fluid.blk {background: #131419;border: 1px solid #0a0b0e;color: #fff;}
+.gl-form.fluid + .input-right {
+	position: absolute;top: 0px;right: 0px;color: #fff;
+	padding: 10px;font-size: inherit;line-height: 1.3;
+}
+
+/*
+ * HTML 显示
+ */
 .gmde-vHTML p {display: block;margin: 12px 0;white-space: pre-wrap;word-break: break-all;}
 .gmde-vHTML h1 {font-size:2rem;font-weight: 700;margin: 12px 0;}
 .gmde-vHTML h2 {font-size:1.75rem;font-weight: 600;margin: 12px 0;}
 .gmde-vHTML h3 {font-size:1.5rem;font-weight: 600;margin: 12px 0;}
+.gmde-vHTML h4 {font-size:1.3rem;font-weight: 600;margin: 12px 0;}
+.gmde-vHTML h5 {font-size:1.1rem;font-weight: 600;margin: 12px 0;}
 .gmde-vHTML .gmd-hr {width: 100%;height: 2px;margin: 32px 0;background: rgb(var(--black-5));}
 .gmde-vHTML em {font-style: italic;}
 .gmde-vHTML img {
-	display: block;margin: 0 auto;
-	max-width: 100%;min-width: 128px;min-height: 128px;
+	display: inline-block;margin: 0 auto;
+	max-width: 100%;min-width: 1px;min-height: 1px;
 }
 .gmde-vHTML .gi-darken {margin: 0 auto;}
 .gmde-vHTML a {
@@ -50,10 +124,25 @@
 .gmde-vHTML a > .gi {margin-right: 4px;}
 .gmde-vHTML a:hover {border-bottom: 2px rgba(253,253,253,0) solid;}
 .gmde-vHTML .quote-box {
-	display: block;padding: 0.5em 1em;
+	display: block;padding: 1px 1em;
 	word-break:break-all;white-space: pre-wrap;
 	border-left: 6px solid rgb(var(--black-7));
 }
+.gmde-vHTML ul,.gmde-vHTML ol {margin: 14px 0 14px 20px;}
+.gmde-vHTML ul li,.gmde-vHTML ol li {position: relative;list-style:none;padding: 3px 0;}
+.gmde-vHTML ul li.child,.gmde-vHTML ol li.child {margin-left: 20px;}
+.gmde-vHTML ul li::before,.gmde-vHTML ol li:before {
+	content: '';display: block;background-color: rgb(var(--white));
+	position: absolute;top: 8px;left: -18px;width: 9px;height: 9px;
+	border-radius: 100%;opacity: .5;transition: all .5s ease;
+}
+.gmde-vHTML ol li:before {
+	border-radius: 0;
+}
+.gmde-vHTML ul li:hover::before,.gmde-vHTML ol li:hover::before {opacity: 1;}
+
+
+.gmde-vHTML .gmd-video {display: block;margin:0 auto;}
 
 /* 移动端 */
 @media screen and (max-width: 720px){
@@ -63,7 +152,7 @@
 
 
 .gmdea-bg{
-	background: linear-gradient(40deg,transparent,rgb(var(--black-15)),transparent,rgb(var(--black-15)),transparent);
+	background: linear-gradient(40deg,transparent,rgb(var(--black-12)),transparent,rgb(var(--black-12)),transparent);
     background-size: 200% 200%;
 	-webkit-animation:gmdea-bg 1s infinite linear;animation:gmdea-bg 1s infinite linear;
 }

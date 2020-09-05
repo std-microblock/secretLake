@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<title id='set-index-title'>Secret Lake - 发布文章</title>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no"/>
+<meta name="Keywords" content="文章Tags"/>
+<meta name="Description" content="文章简介"/>
+<meta name="author" content="Ganxiaozhe"/>
+<link rel="shortcut icon" type="image/ico" href="/favicon.ico"/>
+
+<link type="text/css" rel="stylesheet" href="/lib/css/gxz-basic.css" />
+<link type="text/css" rel="stylesheet" href="/lib/css/gazeimg.css" />
+<link type="text/css" rel="stylesheet" href="/lib/css/gxzMarkDownEditor.css">
+
+<style type="text/css">
+.gart-column {width: 100%;height: 100%;}
+.gart-wrapper {position: relative;width: calc(100% - 200px);height: 100%;overflow-y: auto;}
+
+.gart-nav {
+	height: 100%;width: 200px;
+	box-shadow: 0px 0px 7px 1px rgba(0,0,0,0.1);background-color: rgb(var(--black-15));
+}
+.gart-nav .nav-logo {height: 90px;align-items: flex-end;}
+.gart-nav .nav-logo img {width: 52px;height: 52px;filter: grayscale(1);}
+.gart-nav .nav-wrapper {height: calc(100% - 90px);}
+.nav-list {font-size: 13px;font-weight: 600;text-align: center;}
+.nav-list li {padding:6px 0;letter-spacing: .05em;color: rgb(var(--black-1));}
+.nav-list li:hover,.nav-list li.active {color: rgb(var(--black-6));}
+
+.gl-panel {max-width: 1024px;margin:0 auto;}
+h3,h4 {font-size:1.5em;font-weight: 800;font-family:cursive,sans-serif;}
+h4 {font-size:1.3em;}
+
+@media screen and (min-width: 961px){
+	#navFooter {margin-top: 0!important;}
+}
+/* 小屏 */
+@media screen and (max-width: 960px){
+	.gl-hide-pe {display: none!important;}
+
+	.gart-column {display: block;padding-top: 70px;}
+	.gart-wrapper {display: block;height: auto;width: 100%;}
+
+	.gart-nav {
+		position: fixed;top: 0;left: 0;height: 70px;width: 100%;z-index: 9;
+		display: flex;align-items: center;justify-content: space-between;
+	}
+	.gart-nav .nav-logo {height: 100%;align-items: center;padding-left: 20px;}
+	.gart-nav .nav-logo img {width: 42px;height: 42px;}
+}
+
+.gart-nav .navbtn {display: block;padding: 20px;cursor: pointer;}
+.gart-nav .navbtn:before,.gart-nav .navbtn:after {
+	content: "";
+	display: block;width: 28px;height: 3px;
+	border-radius: 1px;background: rgb(var(--white));
+	transform-origin: 50% 50%;
+	transition: transform 1s cubic-bezier(0.48, 0.43, 0.29, 1.3), background-color 0.3s, height 0.3s
+}
+.gart-nav .navbtn:after {margin-top:10px;}
+.gart-nav .navbtn:hover:before,.gart-nav .navbtn:hover:after {}
+
+#navbtn:checked ~ .navbtn:before {
+	-webkit-transform: translateY(7px) rotate(-225deg);transform: translateY(7px) rotate(-225deg);
+}
+#navbtn:checked ~ .navbtn:after {
+	-webkit-transform: translateY(-7px) rotate(225deg);transform: translateY(-7px) rotate(225deg);
+}
+</style>
+
+</head>
+<body>
+
+<div id='uni-overlayTip' class='uni-overlayTip gl-flex center'>
+	<div class='gl-flex btw'>
+		<img class='loader' src='/lib/img/icon.png'>
+		<div class='line subTip'></div>
+		<div class='tips subTip'>
+			<h5>页面加载缓慢</h5>
+			<p class='sub mt-2'>请检查网络或尝试刷新重试</p>
+		</div>
+	</div>
+</div>
+
+<div class='gart-column gl-flex btw'>
+	<nav class='gart-nav'>
+		<div class='gl-flex center nav-logo'><a href='/'><img src='/lib/img/icon.png'></a></div>
+		<div class='gl-flex center nav-wrapper gl-hide-pe'>
+			<ul class='nav-list'>
+				<a href='/'><li>主页</li></a>
+				<a href='/'><li>文章</li></a>
+				<li class='active'>发布</li>
+				<a href='/'><li>图集</li></a>
+				<a href='/'><li>项目</li></a>
+				<a href='/'><li>关于</li></a>
+			</ul>
+		</div>
+		<input type='checkbox' class='gl-hide' id='navbtn' />
+		<label class='navbtn gl-hide-pc' for='navbtn'></label>
+	</nav>
+	<div class='gart-wrapper'>
+		<div class='gl-panel'>
+			<h3 class='mt-2 mb-4'>Release Your Article</h3>
+			<input class='gl-form fluid' placeholder='文章标题，限制 32 字符内' />
+			<textarea class='gl-form fluid mt-2' placeholder='文章简介，限制 255 字符内'></textarea>
+
+			<h4 class='mt-4 mb-2'>Article Detail</h4>
+			<div id='gmde-container'></div>
+
+			<h4 class='mt-4 mb-2'>Article Tags</h4>
+			<div></div>
+
+			<div class='gl-flex btw'>
+				<div></div>
+				<button class='btn btn-aqua mt-4'>提交发布</button>
+			</div>
+		</div>
+
+		<div class='gl-panel'>
+			<h3 class='mt-2 mb-4'>Article Preview</h3>
+			<div id='rls-preview'></div>
+		</div>
+
+		<footer id='navFooter'></footer>
+	</div>
+</div>
+
+
+<script type="text/javascript" src="/lib/js/gquery.js"></script>
+<script type="text/javascript" src="/lib/js/gxz-basic.js"></script>
+<script type="text/javascript" src="/lib/js/gazeimg.js"></script>
+<script type="text/javascript" src="/lib/js/gxzMarkDownEditor.js"></script>
+
+<script type="text/javascript">
+let _gt = {
+	titles:['Approachable','Amusing','Cute','Dangerous','Exciting','Fatigued','Important','Meticulously','Mysterious','Riveting','Tasteful']
+};
+$(function(){
+	gxz.el.show({el:$('.nav-list li'),wait:500,delay:200});
+
+	__sl.ed = new geditor('gmde-container',{pushHTML:1}).set({
+		preview:'#rls-preview',
+		maxlength: 200000,minlength: 100,
+		autoSave: {
+			name: 'articleRelease',time: 30,load: 1
+		}
+	});
+});
+</script>
+</body>
+</html>

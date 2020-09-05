@@ -164,7 +164,7 @@
 			mousedown: function(e){
 				if(e.which == 3){return;}
 				g.itemp.cd = true;g.itemp.clkt = 1;
-				$('.gazeimg-content img').css("cursor","grabbing");
+				$('.gazeimg-content img').css({cursor:'grabbing'});
 
 				g.t.dx = e.pageX,g.t.dy = e.pageY;
 				g.t.tran = $('.gazeimg-content').css('transform').replace(/[^0-9\-,]/g,'').split(',');
@@ -180,13 +180,13 @@
 				g.t.x = parseInt(g.t.tran[4]) + e.pageX - g.t.dx;
 				g.t.y = parseInt(g.t.tran[5]) + e.pageY - g.t.dy;
 
-				$('.gazeimg-content').css({'transform':'translate('+g.t.x+'px,'+g.t.y+'px)'});
+				$('.gazeimg-content').css({transform:'translate('+g.t.x+'px,'+g.t.y+'px)'});
 			},
 			mouseup: function(e){
 				if(e.which == 3 || g.itemp.clkt == 2){return;}
 				if(g.itemp.cd!='moving'){giShowEnd();}
 
-				g.itemp.cd = false;$('.gazeimg-content img').css("cursor","grab");
+				g.itemp.cd = false;$('.gazeimg-content img').css({cursor:'grab'});
 			},
 			touchstart:function(e){
 				g.itemp.cd = true;g.itemp.clkt++;

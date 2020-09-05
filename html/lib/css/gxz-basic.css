@@ -215,27 +215,6 @@ body.nobar {overflow: hidden;height: auto;}
 	.footerNav .footer-state .disclaimers .listMap {display: block;margin-left: 0;margin-top:5px;}
 }
 
-/*
- * 导航UI [部分]
- */
-#navput {position: relative;width: 100%;height: 50px;}
-.nav_mText {
-	display: block;background-color: rgb(var(--black-15));
-	box-shadow: 0 1px 4px rgba(12,13,14,0.15);
-}
-.nav_content {
-	position: fixed;z-index:9;top: 0;right: 0;
-	display:block;margin:0 auto;background-color: rgb(var(--black-15));
-	-webkit-transition: left,right 0.5s ease-out;transition: left,right 0.5s ease-out;font-weight: 300;
-	box-shadow: 0 1px 4px rgba(12,13,14,0.15);
-}
-#nav-user {
-	display: flex;align-items: center;justify-content: center;
-	height: 50px;line-height: 50px;min-width: 120px;
-	padding:0 15px;float: right;color: rgb(var(--black-6));font-size:15px;
-}
-#nav-user a {color: rgb(var(--white));}
-
 /* PC */
 @media screen and (min-width: 769px){
 	body, button, input, select, textarea {
@@ -244,30 +223,6 @@ body.nobar {overflow: hidden;height: auto;}
 	}
 	#all-container {padding-bottom: 227px;}
 	#navFooter {margin-top: -227px;}
-
-	.nav_mText {height: 50px;}
-	.nav_mText * {display: none;}
-	.nav_cb {display:none;}
-	.nav_flex {display:none;}
-	.wrap-btn {display:none;}
-
-	.nav_content {width:100%;height:50px;min-width:770px;}
-	.nav_content .nav_logo {
-		display:inline-block;width:62px;line-height:50px;
-		padding: 0 15px;float: left;
-	}
-	.nav_content .nav_logo img {width:32px;height:32px;margin-right:6px;vertical-align:middle;}
-
-	.nav_list {display:inline-block;float:right;margin:0;padding:0;}
-	.nav_list li {display:inline-block;margin:0;padding:0;vertical-align: top;}
-	.nav_list li .nav_a {
-		display: inline-block;outline: none;line-height:50px;padding:0 15px;
-		text-shadow: 0 0 1px rgba(255,255,255,0.1);color:rgb(var(--white));
-		letter-spacing: 1px;font-weight: 200;font-size:16px;
-		-webkit-transition: all 0.3s;transition: all 0.3s;
-		text-decoration: none;text-align:center;
-	}
-	.nav_list li .nav_a:hover {background:rgba(var(--white),0.2);box-shadow: inset 0 -1px rgba(0,0,0,0.1);}
 }
  
 
