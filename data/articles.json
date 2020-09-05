@@ -13,5 +13,20 @@
     "tags": [
       "TEST"
     ]
+  },
+  {
+    "fileType": "markdown",
+    "alias": "testupload",
+    "title": "GXZ = RBQ",
+    "subtitle": "(GXZ instanceof Rbq)==true",
+    "img": "https://s1.ax1x.com/2020/09/05/wZFLQA.png",
+    "allowComment": true,
+    "tags": [
+      "RBQ Collect"
+    ],
+    "lastEdit": 1599320013867,
+    "createTs": 1599320013867,
+    "_content": "testupload.txt",
+    "_detail": "testupload.json"
   }
 ]
