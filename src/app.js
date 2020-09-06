@@ -75,6 +75,16 @@ async function main (root) {
           }
           res.end()
         }
+      }, {
+        path: "/release/*",
+        get (req, res) {
+          let name = /\/release\/(\S+)/.exec(req._parsedUrl.path)[1]
+          if (name == "" || name == undefined) return 0;
+          if (name.split("/").length <= 2)
+            res.sendFile(root + "/html/release/" + name + "/index.html")
+          else
+            res.sendFile(root + "/html/release/" + name)
+        }
       },
       //-----------API-------------
       {
@@ -94,7 +104,7 @@ async function main (root) {
           writeFileSync(root + "/data/articles.json", JSON.stringify(articles))
           res.end("a")
         }
-      },
+      }
     ]);
 
     app.get('*', function (req, res) {
