@@ -98,7 +98,7 @@ gxz.theme = {
 			scheme = (scheme === true ? 'light' : gxz.theme.val);
 		}
 
-		$('body').attr('unitvs-theme',scheme);
+		$('body').attr('gxzv-theme',scheme);
 		gxz.theme.val = scheme;
 	}
 }

@@ -7,7 +7,7 @@
  * 
  * CSS 初始化
  */
-body,body[unitvs-theme='light']{
+body,body[gxzv-theme='light']{
 	--white: 38,38,38;
 	--black: 250,250,250;
 	--black-1: 12, 13, 14;--black-2: 20, 23, 25;--black-3: 47, 51, 55;
@@ -16,7 +16,7 @@ body,body[unitvs-theme='light']{
 	--black-10: 187, 192, 196;--black-11: 200, 204, 208;--black-12: 214, 217, 220;
 	--black-13: 228, 230, 232;--black-14: 239, 240, 241;--black-15: 255, 255, 255;
 }
-body[unitvs-theme='dark']{
+body[gxzv-theme='dark']{
 	--white: 255,255,255;
 	--black: 38,38,38;
 	--black-1: 250, 250, 250;--black-2: 239, 240, 241;--black-3: 228, 230, 232;

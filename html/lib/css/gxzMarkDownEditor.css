@@ -43,8 +43,8 @@
 .g-dialog [class^=mgedtNav-] {cursor: pointer;}
 .g-dialog .active[class^=mgedtNav-] {font-weight: 600;}
 .ge-fileup {position: relative;border: 2px dashed #dfdfdf;border-radius: 5px;padding: 20px 20px;transition: all 0.3s ease;}
-.ge-fileup .btn-fileup {opacity: 0;position: absolute;top: 0px;left: 0px;height: 100%;width: 100%;cursor: copy;}
-.ge-fileup .picup-tip {padding: 1rem 0.5rem;text-align: center;}
+.ge-fileup .btn-fileup {opacity: 0;position: absolute;top: 0px;left: 0px;height: 100%;width: 100%;cursor: copy;z-index: 2;}
+.ge-fileup .picup-tip {padding: 1rem 0.5rem;text-align: center;position: relative;z-index: 1;}
 .ge-fileup .picup-tip > .gi {display: block;font-size: 3rem;margin-bottom:0.3rem;}
 
 .gep-preview {
@@ -140,7 +140,9 @@
 	border-radius: 0;
 }
 .gmde-vHTML ul li:hover::before,.gmde-vHTML ol li:hover::before {opacity: 1;}
-
+.gmde-vHTML .card {background: rgb(var(--black-12));display: flex;padding: 1em;}
+.gmde-vHTML .card .head {padding-right: 12px;border-right: 1px solid rgb(var(--black-9));margin-right: 12px;}
+.gmde-vHTML .card .head img {width: 120px;}
 
 .gmde-vHTML .gmd-video {display: block;margin:0 auto;}
 

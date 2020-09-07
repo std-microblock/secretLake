@@ -1,6 +1,6 @@
 // =================================================
 //
-// gQuery v1.2.0 under strict (Only 6kb)
+// gQuery v1.2.5 under strict (Only 6kb)
 //
 // Licensed MIT for open source use
 // or gQuery Commercial License for commercial use

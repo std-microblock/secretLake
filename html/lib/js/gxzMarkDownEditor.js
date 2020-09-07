@@ -20,7 +20,7 @@
 	typeof define === 'function' && define.amd ? define(factory) :
 	(global = window || self, global.geditor = factory());
 
-	console.log('%c gxzMarkDownEditor v1.0.7 %c https://ganxiaozhe.com \n','color: #fff; background: #030307; padding:5px 0; margin-top: 1em;','background: #efefef; color: #333; padding:5px 0;');
+	console.log('%c gxzMarkDownEditor v1.2.0 %c https://ganxiaozhe.com \n','color: #fff; background: #030307; padding:5px 0; margin-top: 1em;','background: #efefef; color: #333; padding:5px 0;');
 }(gQuery,function(){
 	'use strict';
 	var geditor = function(id,opts){
@@ -427,7 +427,7 @@
 			return this;
 		},
 		updateSecHandle: function(){
-			var _this = this;
+			let _this = this;
 			if(this.autoSave.time){
 				this.autoSave.sec--;
 
@@ -443,9 +443,14 @@
 			},1000);
 		},
 		updateHandle: function(){
-			if(typeof this.preview === 'object') {this.previewHandle();}
+			let _ge = {},_this = this;
+			if(typeof this.preview === 'object') {
+				clearTimeout(_this.updateTimeout);
+				_this.updateTimeout = setTimeout(()=>{
+					_this.previewHandle();
+				},350);
+			}
 
-			var _ge = {};
 			_ge.txt = this.input.val();
 			_ge.tlen = this.input.val().length;
 			_ge.minComp = this.length.min - _ge.tlen;
@@ -502,17 +507,6 @@
 				return str;
 			}
 			for (i = 0; i < cells.length; i++) {
-				// 引用
-				if(mat.quote==1){
-					if(cells[i] == '&gt;&gt;&gt;'){
-						cells[i] = '<div class="quote-box">'+mat.quoteArr.join('')+'</div>';mat.quote = 0;
-					} else {
-						t.temp = matToHtml(cells[i]);mat.quoteArr.push(t.temp);cells[i]='';
-					}
-					continue;
-				}
-				if(cells[i] == '&gt;&gt;&gt;'){mat.quoteArr=[];mat.quote = 1;cells[i]='';continue;}
-
 				// 代码块
 				if(mat.code==1){
 					if(cells[i] == '```'){
@@ -523,9 +517,20 @@
 				t.mCode = cells[i].match(/^(?:```.*?)/);
 				if(t.mCode !== null){
 					t.codeLang = cells[i].replace(/```/,'');
-					cells[i] = '<pre class="gcode-autoParse" data-lang="'+t.codeLang+'">';
+					cells[i] = '<pre class="gcode-autoParse '+t.codeLang+'" data-lang="'+t.codeLang+'">';
 					mat.code = 1;continue;
 				}
+
+				// 引用
+				if(mat.quote==1){
+					if(cells[i] == '&gt;&gt;&gt;'){
+						cells[i] = '<div class="quote-box">'+mat.quoteArr.join('')+'</div>';mat.quote = 0;
+					} else {
+						t.temp = matToHtml(cells[i]);mat.quoteArr.push(t.temp);cells[i]='';
+					}
+					continue;
+				}
+				if(cells[i] == '&gt;&gt;&gt;'){mat.quoteArr=[];mat.quote = 1;cells[i]='';continue;}
 
 				// 列表 *
 				t.mList = cells[i].match(/^(?: {0,8}\* .*?)/);
@@ -578,8 +583,14 @@
 
 			_this.preview.html( cells.join("").replace(/<br><\/pre>/g,'</pre>') );
 
+			if(typeof hljs==='object' && 'highlight' in hljs){
+				_this.preview[0].querySelectorAll('.gcode-autoParse').forEach((block) => {hljs.highlightBlock(block);});
+			}
 			gxz.parse.codebox('<br>');
-			$('img[data-gisrc]:not([data-gi-init])').giLazy();
+
+			if(typeof $.fn.giLazy==='function'){
+				$('img[data-gisrc]:not([data-gi-init])').giLazy();
+			}
 		},
 		toHtmlHandle(str,act){
 			act || (act='');
@@ -596,13 +607,18 @@
 				img: new RegExp("!\\[([^'\"]*?)\\]\\((.*?)\\)",'g'),
 				url_img: new RegExp("\\[(<img.*?)\\]\\((.*?)\\)",'g'),
 				url: new RegExp("\\[([^\\n]*?)\\]\\((.*?)\\)",'g'),
+				card: new RegExp("^\\[{3}(.*?)\\|{3}(.*?)\\|{2}(.*?)\\]{3}",'g'),
 				bilibili: new RegExp("^\\[bilibili\\](.*?)\\[\/bilibili\\]$"),
 			},_t = {};
+
+			_pre.rp_img = (typeof $.fn.giLazy==='function' ? '<img alt="$1" data-gisrc="$2" data-gazeimg>' : '<img alt="$1" src="$2">');
 
 			if(act=='inline'){
 				str = str.replace(_pre.bold,'<strong>$1</strong>')
 					.replace(_pre.italic,'<em>$1</em>')
 					.replace(_pre.noun,'<span class="code-text">$1</span>')
+					.replace(_pre.img,_pre.rp_img)
+					.replace(_pre.url_img,'<a href="$2" target="_blank">$1</a>')
 					.replace(_pre.url,'<a href="$2" target="_blank"><i class="gi icon-weibiaoti-"></i>$1</a>');
 				return str;
 			}
@@ -616,9 +632,10 @@
 				.replace(_pre.bold,'<strong>$1</strong>')
 				.replace(_pre.italic,'<em>$1</em>')
 				.replace(_pre.noun,'<span class="code-text">$1</span>')
-				.replace(_pre.img,'<img alt="$1" data-gisrc="$2" data-gazeimg>')
+				.replace(_pre.img,_pre.rp_img)
 				.replace(_pre.url_img,'<a href="$2" target="_blank">$1</a>')
-				.replace(_pre.url,'<a href="$2" target="_blank"><i class="gi icon-weibiaoti-"></i>$1</a>');
+				.replace(_pre.url,'<a href="$2" target="_blank"><i class="gi icon-weibiaoti-"></i>$1</a>')
+				.replace(_pre.card,'<div class="card"><div class="head">$1</div><div class="body"><h5 class="mt-0 mb-2">$2</h5><div class="glt-wrap">$3</div></div></div>');
 
 			_t.preW = this.preview.width();
 			_t.videoW = (_t.preW>1024 ? 1024 : _t.preW);_t.videoH = Math.floor(_t.videoW/1.48);
