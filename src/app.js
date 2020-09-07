@@ -12,7 +12,37 @@ async function main (root) {
   app.use(bodyParser.json());
   app.use(bodyParser.urlencoded({ extended: false }));
   function read (path) { return readFileSync(path).toString() }
+  function errorPage (code = "404", title = "Not Found", subtitle = "This is NOT your problem! Please contect the blog owner.", cursor = "https://s1.ax1x.com/2020/08/30/dqmuwT.png") {
 
+    return `
+    
+    
+    <!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <title>${code} ${title} - SecretLake</title>
+  <style>
+  *{overflow:hidden;cursor:url("${cursor}"),auto;}
+    div {width: 100vw;text-align: center;user-select:none;}
+    a, a:hover, a:visited, a:active, a:link {text-decoration: none;color: #000;}
+    .a404{height: 66px;margin-top: calc(50vh - 80px);font-weight:700;font-size:36px;}
+    .hcode {font-size:55px;font-weight: 800;}
+    .nfound{font-weight:500;color:gray;font-size:13px;}
+    .powby {
+      position:fixed;bottom:20px;left:0;
+      font-size:12px;color:gray;
+    }
+  </style>
+</head>
+<body>
+  <div class='a404'><span class='hcode'>${code}</span> ${title}</div>
+  <div class='nfound'>${subtitle}</div>
+  <div class='powby'>powered by <a href='//secretlake.org?form=errorPage_${code}'>SecretLake</a></div>
+</body>
+</html>`
+  }
   createServer();
   function createServer () {
     let server = require("./route")(app, [
@@ -45,6 +75,10 @@ async function main (root) {
             }
             return article;
           }
+          if (article.private) {
+            res.send(errorPage("<div style='float:left;font-size:52px;letter-space:2px;'>401</div> Unauthorized", "This is a private article. Only its owner can see it."));
+            return 0;
+          }
           let html = parseHTML(
             readFileSync(root + "/html/article.html").toString(),
             {
@@ -60,20 +94,20 @@ async function main (root) {
           if (name == "") return 0;
           if (existsSync(root + "/html/lib/" + name)) { res.sendFile(root + "/html/lib/" + name); return 0; }
           else {
-            res.send(`
-          <!DOCTYPE html>
-          <html lang="en">
-          <head>
-          <meta charset="utf-8">
-          <title>Error</title>
-          </head>
-          <body>
-          <pre>Cannot GET ${req._parsedUrl.path}</pre>
-          </body>
-          </html>`)
+            res.send(errorPage());
             res.statusCode = 404;
           }
           res.end()
+        }
+      }, {
+        path: "/release/*",
+        get (req, res) {
+          let name = /\/release\/(\S+)/.exec(req._parsedUrl.path)[1]
+          if (name == "" || name == undefined) return 0;
+          if (name.split("/").length <= 2)
+            res.sendFile(root + "/html/release/" + name + "/index.html")
+          else
+            res.sendFile(root + "/html/release/" + name)
         }
       },
       //-----------API-------------
@@ -94,38 +128,19 @@ async function main (root) {
           writeFileSync(root + "/data/articles.json", JSON.stringify(articles))
           res.end("a")
         }
-      },
+      }
     ]);
 
     app.get('*', function (req, res) {
       res.statusCode = 404
-      res.send(`<style>
-      *{overflow:hidden;cursor:url("https://s1.ax1x.com/2020/08/30/dqmuwT.png"),auto;}
-      .a404{
-        left: 0;
-        top: 0;
-        width: 100vw;
-        height: 60px;
-        margin-top: calc(50vh - 80px);
-        text-align: center;
-        font-weight:700;
-        font-size:40px;
-        user-select:none;
-    }
-.nfound{
-  width: 100vw;
-  font-weight:500;
-  color:gray;
-  text-align: center;
-  user-select:none;
-}
-    </style><div class="a404">404</div><div class="nfound">Not Found</div>`);
-    });
+      res.send(errorPage());
+    })
     app.listen(80, () => { console.log("服务器已经运行 | 端口 80"); });
   }
 
 
 }
+
 
 
 
