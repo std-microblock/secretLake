@@ -332,8 +332,6 @@ gxz.overlay = {
 	ti:30
 }
 
-if(window.location.host.indexOf('gxzv') < 0){window.location.href='//www.gxzv.com';}
-
 $(function(){
 	let t = {},i;
 
