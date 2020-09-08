@@ -76,7 +76,7 @@ async function main (root) {
             return article;
           }
           if (article.private) {
-            res.send(errorPage("<div style='float:left;font-size:52px;letter-space:2px;'>401</div> Unauthorized", "This is a private article. Only its owner can see it."));
+            res.send(errorPage("401","Unauthorized", "This is a private article. Only its owner can see it."));
             return 0;
           }
           let html = parseHTML(
