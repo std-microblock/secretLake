@@ -90,7 +90,8 @@ async function main (root) {
       }, {
         path: "/lib/*",
         get (req, res) {
-          let name = /\/lib\/(\S+)/.exec(req._parsedUrl.path)[1]
+
+          let name = /\/lib\/(\S+)/.exec(req._parsedUrl.pathname)[1]
           if (name == "") return 0;
           if (existsSync(root + "/html/lib/" + name)) { res.sendFile(root + "/html/lib/" + name); return 0; }
           else {
@@ -104,7 +105,7 @@ async function main (root) {
         get (req, res) {
           let name = /\/release\/(\S+)/.exec(req._parsedUrl.path)[1]
           if (name == "" || name == undefined) return 0;
-          if (name.split("/").length <= 2)
+          if (name.indexOf(".")==-1)
             res.sendFile(root + "/html/release/" + name + "/index.html")
           else
             res.sendFile(root + "/html/release/" + name)
