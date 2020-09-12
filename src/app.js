@@ -75,6 +75,10 @@ async function main (root) {
             }
             return article;
           }
+          if (article == undefined) {
+            res.send(errorPage());
+            return 0;
+          }
           if (article.private) {
             res.send(errorPage("401", "Unauthorized", "This is a private article. Only its owner can see it."));
             return 0;
