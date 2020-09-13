@@ -63,7 +63,7 @@ async function main (root) {
       }, {
         path: "/article/*",
         get (req, res) {
-          let name = /\/article\/(\S+)/.exec(req._parsedUrl.path)[1], article = findArticle(name);
+          let name = /\/article\/(\S+)/.exec(req._parsedUrl.pathname)[1], article = findArticle(name);
           function findArticle (name) {
             let article;
             let articles = readJSON("/data/articles.json");
@@ -75,11 +75,12 @@ async function main (root) {
             }
             return article;
           }
+          console.log(name, article)
           if (article == undefined) {
             res.send(errorPage());
             return 0;
           }
-          if (article.private) {
+          if (article.private && req._parsedUrl.path.split("?").pop() != "password") {
             res.send(errorPage("401", "Unauthorized", "This is a private article. Only its owner can see it."));
             return 0;
           }
