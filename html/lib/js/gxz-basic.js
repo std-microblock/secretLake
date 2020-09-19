@@ -2,7 +2,7 @@
 
 'use strict';var __sl = {};
 if( typeof gxz != 'object' ){
-	console.log("%c SecretLake %c A Light,Beauty,Inact Blog ","color: #fff; margin-top: 1em; padding: 5px 0; background: #000; font-weight: 600;","margin-bottom: 1em; padding: 5px 0; background: #efefef; color: #333");
+	console.log("%c SecretLake %c A Light, Beauty, Inact Blog ","color: #fff; margin-top: 1em; padding: 5px 0; background: #000; font-weight: 600;","margin-bottom: 1em; padding: 5px 0; background: #efefef; color: #333");
 }
 var gxz = {
 	namespace: function(ns){
@@ -147,34 +147,36 @@ gxz.el = {
 	show: function(opts){
 		if(typeof opts !== 'object') {return 'empty object';}
 		opts.el = ( typeof opts.el === 'object' ? opts.el : $(opts.el) );
-		isNaN(opts.delay) && (opts.delay=500);
+		isNaN(opts.duration) && (opts.duration=500);
 		isNaN(opts.wait) && (opts.wait=0);
+		isNaN(opts.delay) && (opts.delay=0);
 
-		opts.ani = ( (opts.top) ? 1 : 0 );
+		opts.ani = ( (opts.top || opts.left) ? 1 : 0 );
 		opts.top || (opts.top='0px');
+		opts.left || (opts.left='0px');
 
 		opts.el.css({'opacity':0});
 		opts.el.each(function(){
-			let _this = $(this);
-			opts.css = {};
+			let _this = $(this);opts.css = {};
 
 			if(opts.ani){
 				opts.css.pos = _this[0].style.position || 'relative';
-				_this.css({'position':opts.css.pos,'top':opts.top})
+				_this.css({'position':opts.css.pos,'top':opts.top,'left':opts.left})
 			}
 
 			setTimeout(()=>{
-				let aarr = {opacity:1};
-				if(opts.ani){aarr.top = '0px';}
+				this.animate([
+					{opacity: 0,top: opts.top,left: opts.left},
+					{opacity:1,top:'0px',left:'0px'}
+				],opts.duration);
 				
-				this.animate([aarr],opts.delay);
 				setTimeout(()=>{
-					_this[0].style.transition = '';_this[0].style.opacity = '';
-					if(opts.ani){_this[0].style.position = '';_this[0].style.top = '';}
-				},opts.delay);
+					_this[0].style.opacity = '';
+					if(opts.ani){_this.css({position:'',top:'',left:''});}
+				},opts.duration);
 			},opts.wait);
 
-			opts.wait += opts.delay;
+			opts.wait += opts.duration+opts.delay;
 		});
 
 		return this;
@@ -194,8 +196,7 @@ gxz.saying = {
 		{word:'世界上有太多孤独的人，害怕先踏出第一步',source:'《绿皮书》'},
 		{word:'迷途漫漫，终有一归',source:'《不能承受的生命之轻》'},
 		{word:'站远一点，才有机会去感动',source:''},
-		{word:'想与你登临 摘雾霭晨曦',source:'《你一生的故事》'},
-		{word:'你问我爱你值不值得，其实你应该知道，爱就是不问知值不值得',source:'张爱玲'},
+		{word:'你问我爱你值不值得，其实你应该知道，爱就是不问值不值得',source:'张爱玲'},
 		{word:'等着别人来爱你，不如自己爱自己',source:'毕淑敏'},
 		{word:'报最大的希望，尽最大的努力，做最坏的打算，然后一切随缘，随遇而安',source:''},
 		{word:'爱你所爱，行你所行，听从你心，无问西东',source:''},
@@ -266,7 +267,7 @@ gxz.pages = {
 		if(this.qmin==1){this.push(1,0);}
 
 		t.qhtml = '';
-		this.parr = this.parr.sort(function(a,b){return a - b})
+		this.parr = this.parr.sort(function(a,b){return a - b});
 		for (i = 0; i < this.parr.length; i++) {
 			t.pg = this.parr[i];
 			if(t.pg==opts.page){
@@ -282,12 +283,12 @@ gxz.pages = {
 
 		if(this.qmax==0){
 			if(opts.turnType=='func'){
-				t.qhtml += "<div class='page-item clear'>...</div><div class='page-item page-turnTo'>"+_p.total+"</div>";
+				t.qhtml += "<div class='page-item clear'>...</div><div class='page-item page-turnTo'>"+opts.maxPage+"</div>";
 			} else {
 				t.qhtml += "<div class='page-item clear'>...</div><a class='page-item' href='"+opts.pQuery+opts.maxPage+"'>"+opts.maxPage+"</a>";
 			}
 		}
-		if(this.qmin==0){
+		if(this.qmin==0 && opts.page!=3){
 			if(opts.turnType=='func'){
 				t.qhtml = "<a class='page-item page-turnTo'>1</a><div class='page-item clear'>...</div>"+t.qhtml;
 			} else {
@@ -302,9 +303,9 @@ gxz.pages = {
 		}
 	},
 	push: function(page,idx){
-		!idx&&idx!=0 && (idx=this.parr.length-1);
+		(!idx&&idx!=0) && (idx=this.parr.length-1);
 		this.parr.splice(idx,0,page);
-		this.parr = gQuery.array.unique(this.parr);
+		this.parr = $.array.unique(this.parr);
 	}
 }
 /*
@@ -347,51 +348,41 @@ $(function(){
 	window.matchMedia("(prefers-color-scheme: light)").addListener(gxz.theme.change);
 
 	gxz.parse.codebox();gxz.parse.number();gxz.parse.time();
+	$('.set-gq-version').text(__sl.version);
 });
 
 //顶部导航放置
 gxz.namespace("nav");
 function navPut() {
 	let nav = {user:""};
-	nav.header = $('#navput:not([data-disable])');
+	nav.header = $('nav#nav:not([data-disable])');
 
-	if(nav.header.length > 0) {
-		if( typeof nav.header.attr('data-hide-user') == 'undefined' ){
-			nav.user = "<div id='nav-user'><div class='tip'><a href='/u/signin/'>登入</a> 或 <a href='/u/register/'>注册商家</a></div></div>";
-		}
-		
-		nav.header.html('Nav');
-		nav.header.find('.dropdown').click(function(){
-			$(this).toggleClass('active');
-		});
-		_navUserUpdate();
-	}
-}
-function _navUserUpdate(){
-	return;
-	$.ajax({
-		type:"POST",url:"/lib/php/user/information.php",
-		data:{action:'getPrivate'}
-	}).done(function(str){
-		let resp;
-		try{resp = JSON.parse(str);} catch(err){console.log(str);return;}
+	if(nav.header.length < 1) {return;}
 
-		resp.id = parseInt(resp.id);resp.newMsg = parseInt(resp.newMsg);
-		resp.power = parseInt(resp.power);resp.status = parseInt(resp.status);
-		gxz.user = resp;
-		if(resp.g_status!='success'){return;}
-		
-		$('#nav-user').html("<a class='gl-avatar' href='/u/' target='_self'><img src='"+resp.avatar+"'></a>");
-		$('#nav-user').on({
-			'mouseover':function(){$(this).find('.gl-avatar').addClass('ga-shake');},
-			'mouseleave':function(){$(this).find('.gl-avatar').removeClass('ga-shake');}
-		});
-
-		if(resp.newMsg>0){
-			resp.newMsg>99 && (resp.newMsg='99+');
-			$('#nav-user').append("<span class='nav_user_message_count'>"+resp.newMsg+"</span>");
+	$('#navbtn').on('click',function(){
+		if(this.checked){
+			$('body')[0].style.overflow = 'hidden';
+			gxz.el.show({el:$('#navlist .nav-grid .item'),wait:500,duration:300});
+		} else {
+			$('body')[0].style.overflow = '';
 		}
 	});
+
+	$(window).on('scroll',function(){
+		let t = {};
+		__sl.scroTopLast = __sl.scroTop || 0;
+		__sl.scroTop = document.body.scrollTop==0?document.documentElement.scrollTop:document.body.scrollTop;
+		__sl.scroTop < 70 && (__sl.scroTop=0);
+
+		t.diff = __sl.scroTopLast - __sl.scroTop;
+		t.navTop = $('#nav').css('top') || '0px';
+
+		if(t.diff<0 && t.navTop=='0px'){
+			$('#nav').css('top','-70px')[0].animate([{top:'0px'},{top:'-70px'}],500);
+		} else if(t.diff>=0 && t.navTop=='-70px') {
+			$('#nav').css('top','0px')[0].animate([{top:'-70px'},{top:'0px'}],500);
+		}
+	},{passive:true});
 }
 function footerPut() {
 	let footer = $('#navFooter')[0] || false, t = {};
@@ -407,10 +398,12 @@ function footerPut() {
 		t.say.source!='' && (t.sayT+=' —'+t.say.source);
 
 		footer.innerHTML = "<div class='footerNav'>"+
-			"<div class='footer-banner'><a class='item' href='https://mc.ganxiaozhe.com' target='_blank'><i class='icon gi icon-leaf-1'></i><span class='text'>Ganxiaozhe</span></a><a class='item' href='https://www.mcadmin.cn' target='_blank'><i class='icon gi icon-cube'></i><span class='text'>MCAdmin</span></a></div>"+
+			"<div class='footer-banner'><a class='item' href='https://www.gxzv.com' target='_blank'><i class='icon gi icon-leaf-1'></i><span class='text'>Ganxiaozhe</span></a>"+
+				"<a class='item' href='https://www.mcadmin.cn' target='_blank'><i class='icon gi icon-cubes'></i><span class='text'>MCAdmin</span></a>"+
+				"<a class='item' href='https://www.unitvs.com' target='_blank'><i class='icon gi icon-upload-cloud'></i><span class='text'>UnitVS</span></a></div>"+
 			"<div class='footer-state'>"+
-				"<div class='gl-flex btw'><div class='gxz-info'><a href='//www.unitvs.com/' target='_blank'>gxzv.com</a> / <a href='http://beian.miit.gov.cn/' target='_blank'>渝ICP备20007909号-4</a></div><div class='disclaimers'><span>Copyright © 2020 GXZV. All rights reserved./</span><div class='listMap'><a id='gxz-copyright' href='/copyright.html'>法律声明及版权</a> / <a id='gxz-mdf-theme'><i class='gi "+t.icon+"'></i> 主题</a></div></div></div>"+
-				"<div class='gl-flex btw'><div class='gxz-info'>"+t.sayT+"</div><div class='disclaimers'>powered by <a target='_blank' href='https://secretlake.org/'>SecretLake</a></div></div>"+
+				"<div class='gl-flex btw'><div class='gxz-info'><a href='//www.qguery.net/' target='_blank'>gquery.net</a> / <a href='http://beian.miit.gov.cn/' target='_blank'>渝ICP备20007909号-5</a></div><div class='disclaimers'><span>Copyright © 2020 gQuery. All rights reserved./</span><div class='listMap'><a href='/about/'>About</a> / <a href='/about/license/'>License</a> / <a id='gxz-mdf-theme'><i class='gi "+t.icon+"'></i> 主题</a></div></div></div>"+
+				"<div class='gl-flex btw'><div class='gxz-info'>"+t.sayT+"</div><div class='disclaimers'>powered by Ganxiaozhe</div></div>"+
 			"</div>"+
 		"</div>";
 
