@@ -147,7 +147,8 @@
     .idx-container .gbox .cover:hover img {
       transform: scale(1.1);
       filter: brightness(0.7);
-    }
+      {{{:if config.indexPage.articles.hover.backgroundBlur is true:backdrop-filter:blur(10px);}}}
+}
 
     .idx-container .gbox .attrs {
       position: absolute;

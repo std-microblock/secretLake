@@ -1,0 +1,9 @@
+{
+  "indexPage": {
+    "articles": {
+      "hover": {
+        "backgroundBlur": true
+      }
+    }
+  }
+}

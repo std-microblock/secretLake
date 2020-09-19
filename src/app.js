@@ -63,7 +63,7 @@ async function main (root) {
       }, {
         path: "/article/*",
         get (req, res) {
-          let name = /\/article\/(\S+)/.exec(req._parsedUrl.path)[1], article = findArticle(name);
+          let name = /\/article\/(\S+)/.exec(req._parsedUrl.pathname)[1], article = findArticle(name);
           function findArticle (name) {
             let article;
             let articles = readJSON("/data/articles.json");
@@ -75,8 +75,13 @@ async function main (root) {
             }
             return article;
           }
-          if (article.private) {
-            res.send(errorPage("<div style='float:left;font-size:52px;letter-space:2px;'>401</div> Unauthorized", "This is a private article. Only its owner can see it."));
+          console.log(name, article)
+          if (article == undefined) {
+            res.send(errorPage());
+            return 0;
+          }
+          if (article.private && req._parsedUrl.path.split("?").pop() != "password") {
+            res.send(errorPage("401", "Unauthorized", "This is a private article. Only its owner can see it."));
             return 0;
           }
           let html = parseHTML(
@@ -90,7 +95,8 @@ async function main (root) {
       }, {
         path: "/lib/*",
         get (req, res) {
-          let name = /\/lib\/(\S+)/.exec(req._parsedUrl.path)[1]
+
+          let name = /\/lib\/(\S+)/.exec(req._parsedUrl.pathname)[1]
           if (name == "") return 0;
           if (existsSync(root + "/html/lib/" + name)) { res.sendFile(root + "/html/lib/" + name); return 0; }
           else {
@@ -104,7 +110,7 @@ async function main (root) {
         get (req, res) {
           let name = /\/release\/(\S+)/.exec(req._parsedUrl.path)[1]
           if (name == "" || name == undefined) return 0;
-          if (name.split("/").length <= 2)
+          if (name.indexOf(".") == -1)
             res.sendFile(root + "/html/release/" + name + "/index.html")
           else
             res.sendFile(root + "/html/release/" + name)
@@ -118,6 +124,7 @@ async function main (root) {
           let articles = readJSON("/data/articles.json");
 
           let ext = ".md"
+
           writeFileSync(root + "/data/content/" + req.body.alias + ext, req.body.content)
           req.body._content = req.body.alias + ext
           req.body.content = undefined

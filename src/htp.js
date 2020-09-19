@@ -1,5 +1,8 @@
 module.exports = {
   parseHTML (htmlTP, valuesR) {
+    let { readJSON } = require("./jsonmgr")(process.cwd());
+
+
     function get (path, values, returnObj = 0) {
       path = path.split("."), tmp = values;
       try {
@@ -65,9 +68,17 @@ module.exports = {
       }
     }
     return parseStr(htmlTP, function parseFn (str, values = valuesR) {
+      values.config = readJSON("/config.json")
       str = str.substr(3, str.length - 6)
       let content = str[0] == ":" ? str.split(":").slice(2).join(":") : str;
       let type = str[0] == ":" ? str.split(":")[1].split(" ")[0] : "value"
+      function getArgs (argList) {
+        let args = str.split(":")[1].split(" "), result = {};
+        for (let i = 0; i < args.length; i++)
+          for (let u in argList)
+            if (args[i] == u) result[argList[u]] = args[i + 1];
+        return result;
+      }
       switch (type) {
         case "for": {
           let args = str.split(":")[1].split(" "), forArgs = {};
@@ -99,6 +110,27 @@ module.exports = {
         case "value": {
           return get(content, values);
         }
+        case "if": {
+          let args = getArgs({
+            if: "left",
+            is: "is",
+            ["isn't"]: "isnot",
+            equal: "equal",
+            unequal: "unequal",
+          });
+          console.log(args, get(args.left, values), values)
+          if (args.is != undefined)
+            if (get(args.left, values).toString() == args.is)
+              return content;
+          if (args.isnot != undefined)
+            if (get(args.left, values).toString() != args.isnot)
+              return content;
+          if (args.unequal != undefined)
+            if (get(args.left, values).toString() != get(args.unequal, values))
+              return content;
+          return "";
+        }
+
       }
       return "";
     }).str

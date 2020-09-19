@@ -3,7 +3,7 @@
     "_content": "1.md",
     "fileType": "markdown",
     "_detail": "1.json",
-    "alias": "a",
+    "alias": "1",
     "lastEdit": 2012345,
     "createTs": 2011111,
     "title": "test",
@@ -29,5 +29,22 @@
     "createTs": 1599320013867,
     "_content": "testupload.txt",
     "_detail": "testupload.json"
+  },
+  {
+    "alias": "a",
+    "cover": {},
+    "title": "a",
+    "subtitle": "a",
+    "fileType": "markdown",
+    "allowComment": 1,
+    "img": "https://s1.ax1x.com/2020/09/05/wZFLQA.png",
+    "private": true,
+    "tags": [
+      "a"
+    ],
+    "lastEdit": 1599834887683,
+    "createTs": 1599834887683,
+    "_content": "a.md",
+    "_detail": "a.json"
   }
 ]
